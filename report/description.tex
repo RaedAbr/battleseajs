@@ -1,0 +1,44 @@
+\documentclass[a4paper, 11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[scaled]{helvet}
+\renewcommand\familydefault{\sfdefault}
+\usepackage[T1]{fontenc}
+\usepackage[francais]{babel}
+\usepackage[left=2.2cm,top=2.2cm,right=2.2cm,bottom=2.2cm]{geometry}
+\usepackage{graphicx}
+\usepackage{authblk}
+\usepackage{enumitem}
+\begin{document}
+
+\title{Battle Sea JS} 
+\author{Raed Abdennadher et Steven Liatti} 
+\affil{\small Université d'été - Prof Jean-Luc Falcone} 
+\affil{\small Hepia ITI 2\up{ème} année} 
+\maketitle
+
+\noindent
+Le but de notre projet est d’implémenter un jeu de bataille navale (« touché-coulé ») en Javascript. Le jeu de bataille navale est un jeu tour par tour ou chaque joueur dispose de bateaux sur une grille. Le but du jeu est de couler tous les bateaux de son adversaire.
+
+\section*{Implémentation minimale}
+\noindent
+Nous aimerions créer le mode de jeu standard, avec son interface minimale (le positionnement des bateaux, cliquer pour « toucher ») côté client. Coté serveur, nous pensions utiliser Node.js pour faire le lien entre les deux joueurs (transmission des ordres de tir, répercussion sur la grille de l’adversaire).
+
+\section*{Améliorations}
+\noindent
+
+\begin{itemize}
+	\item Côté client :
+	\begin{itemize}
+		\item Enrichir l’interface graphique : bateaux sous forme d’images, effets d’explosion, animations, etc.
+		\item Ajout des effets sonores.
+		\item Modes de jeu alternatifs (que le classique).
+	\end{itemize}
+	\item Côté serveur :
+	\begin{itemize}
+		\item Mode joueur contre la machine.
+		\item Mode spectateur : identifiant unique par partie qui permet de la visionner.
+		\item Enregistrement en base de données (MongoDB) pour rejouer les parties.
+	\end{itemize}
+\end{itemize}
+
+\end{document}
