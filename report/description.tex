@@ -8,6 +8,16 @@
 \usepackage{graphicx}
 \usepackage{authblk}
 \usepackage{enumitem}
+
+\usepackage{hyperref} 
+\hypersetup{
+	colorlinks,
+	citecolor=black,
+	filecolor=black,
+	linkcolor=black,
+	urlcolor=blue
+}
+
 \begin{document}
 
 \title{Battle Sea JS} 
@@ -17,7 +27,9 @@
 \maketitle
 
 \noindent
-Le but de notre projet est d’implémenter un jeu de bataille navale (« touché-coulé ») en Javascript. Le jeu de bataille navale est un jeu tour par tour ou chaque joueur dispose de bateaux sur une grille. Le but du jeu est de couler tous les bateaux de son adversaire.
+Le but de notre projet est d’implémenter un jeu de bataille navale (« touché-coulé ») en Javascript. Le jeu de bataille navale est un jeu tour par tour ou chaque joueur dispose de bateaux sur une grille. Le but du jeu est de couler tous les bateaux de son adversaire. 
+\newline
+Le projet est disponible sur \url{https://github.com/steenput/battleseajs}
 
 \section*{Implémentation minimale}
 \noindent
@@ -40,5 +52,9 @@ Nous aimerions créer le mode de jeu standard, avec son interface minimale (le p
 		\item Enregistrement en base de données (MongoDB) pour rejouer les parties.
 	\end{itemize}
 \end{itemize}
+
+\section*{Partage des tâches}
+\noindent
+Raed va commencer par l'interface graphique : la grille, les couleurs, les bateaux, etc. Steven va commencer par le serveur Node.js et l'échange des événements (lien côté client/serveur).
 
 \end{document}
