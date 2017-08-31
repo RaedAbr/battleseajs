@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Test</title>
+</head>
+<body>
+	<h1>Hello Wolrd !</h1>
+
+	<p id="playerName">Waiting ...</p>
+
+	<script src="static/test.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+		let playerName = prompt("Player name :")
+		let socket = io.connect("http://localhost:8080");
+		socket.emit("playerName", playerName);
+		socket.on("data", function (data) {
+			document.getElementById("playerName").innerHTML = "Player " + data.name + " connected (id : " + data.id + ")";
+		});
+	</script>
+</body>
+</html>
