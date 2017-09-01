@@ -29,7 +29,7 @@ function Ship(name, startCell, endCell, rowsCols) {
 				return size + 1;
 			}
 			else {
-				return size / 10 + 1;
+				return size / rowsCols + 1;
 			}
 		},
 		toString: function() {

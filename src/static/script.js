@@ -1,31 +1,18 @@
-let socket = io.connect('http://localhost:8080');
-
-let gridW = 300,
-    gridH = 500,
+var mapW = 300,
+    mapH = 500,
     z = 30,
-    nb = gridW / z;
+    nb = mapW / z;
+
 ////////////////////////////map1/////////////////////////////////////////
-let svg1 = d3.select("#map1").append("svg")
-    .attr("width", gridW + 9)
-    .attr("height", gridH + 9);
+let svg1 = map("#map1", 1);
+/////////////////////////////map2//////////////////////////////////////
+let svg2 = map("#map2", 2);
+
 
 svg1.selectAll("rect")
-    .data(d3.range(nb * nb))
-    .enter().append("rect")
-    .attr("id", function (d) {
-      return "g1" + d;
-    })
-    .attr("transform", translate)
-    .attr("width", z)
-    .attr("height", z)
-    .style("fill", "steelblue")
-    .on("mouseover", handleMouseOver)
+	.on("mouseover", handleMouseOver)
     .on("mouseout", handleMouseOut)
     .on("click", handleMouseClick);
-
-function translate(d) {
-  return "translate(" + (d % nb * z) + ", " + (Math.floor(d / nb) * z) + ")";
-}
 
 function handleMouseOver(d) {
   // this.parentNode.appendChild(this);
@@ -38,25 +25,10 @@ function handleMouseOut(d) {
 
 function handleMouseClick(d) {
 	d3.select(this).style("fill", "red");
-	socket.emit('message', d);
+	// socket.emit('message', d);
 	console.log("from client " + d);
 }
 
-/////////////////////////////map2//////////////////////////////////////
-let svg2 = d3.select("#map2").append("svg")
-    .attr("width", gridW+ 9)
-    .attr("height", gridH + 9);
-
-svg2.selectAll("rect")
-    .data(d3.range(nb * nb))
-    .enter().append("rect")
-    .attr("id", function (d) {
-      return "g2" + d;
-    })
-    .attr("transform", translate)
-    .attr("width", z)
-    .attr("height", z)
-    .style("fill", "steelblue");
 
 ///////////////////////////////bateaux/////////////////////////////////////////    
 let drag = d3.behavior.drag()
@@ -75,20 +47,20 @@ let drag = d3.behavior.drag()
     	magnet(d, d3.select(this));
     	// if (collision(d, d3.select(this))) {
     	// 	d3.select(this)
-    	// 		.attr("x", initialData[i].x)
-    	// 		.attr("y", initialData[i].y)
-    	// 		.attr("width", initialData[i].width)
-    	// 		.attr("height", initialData[i].height);
-    	// 	d.x = initialData[i].x;
-    	// 	d.y = initialData[i].y;
-    	// 	d.width = initialData[i].width;
-    	// 	d.height = initialData[i].height;
+    	// 		.attr("x", initialShipData[i].x)
+    	// 		.attr("y", initialShipData[i].y)
+    	// 		.attr("width", initialShipData[i].width)
+    	// 		.attr("height", initialShipData[i].height);
+    	// 	d.x = initialShipData[i].x;
+    	// 	d.y = initialShipData[i].y;
+    	// 	d.width = initialShipData[i].width;
+    	// 	d.height = initialShipData[i].height;
     	// }
         console.log('drag end');
     });
 
 let collision = function(d, object) {
-	let result = data.filter(x => intersects(d, x));
+	let result = shipData.filter(x => intersects(d, x));
 	if (result.length != 0)
 		return true;
 	return false;
@@ -121,22 +93,22 @@ let defineLimits = function(d, object) {
 		object.attr('x', 0);
 		d.x = 0;
 	}
-	if (d.x + d.width > gridW) {
-		object.attr('x', gridW - d.width);
-		d.x = gridW - d.width;
+	if (d.x + d.width > mapW) {
+		object.attr('x', mapW - d.width);
+		d.x = mapW - d.width;
 	}
 	if (d.y < 0) {
 		object.attr('y', 0);
 		d.y= 0;
 	}
-	if (d.y + d.height > gridW) {
-		object.attr('y', gridW - d.height);
-		d.y = gridW - d.height;
+	if (d.y + d.height > mapW) {
+		object.attr('y', mapW - d.height);
+		d.y = mapW - d.height;
 	}
 }
     
 
-let initialData = [
+let initialShipData = [
 	{x : 10, y : 310, width : 2 * z, height : z, dir : "h", color : "maroon", img : "boat.png"},
 	{x : 10, y : 342, width : 3 * z, height : z, dir : "h", color : "chartreuse"},
 	{x : 10, y : 374, width : 3 * z, height : z, dir : "h", color : "darkgreen"},
@@ -144,8 +116,8 @@ let initialData = [
 	{x : 10, y : 438, width : 5 * z, height : z, dir : "h", color : "gold"}
 	];
 
-let data = [];
-initialData.map(item => data.push({
+let shipData = [];
+initialShipData.map(item => shipData.push({
 	x : item.x, 
 	y : item.y, 
 	width : item.width, 
@@ -153,20 +125,17 @@ initialData.map(item => data.push({
 	dir : item.dir, 
 	color : item.color
 }));
-// svg1.append('rect')
-//   .attr('width', w)
-//   .attr('height', h)
-//   .attr('fill', '#cc99ff');
   
 svg2.selectAll('.ship')
-	.data(data)
+	.data(shipData)
 	.enter()
-	.append('rect')
+	.append('image')
 	.attr('x', function(d){ return d.x; })
 	.attr('y', function(d){ return d.y; })
 	.attr('width', function(d){ return d.width; }) 
 	.attr('height', function(d){ return d.height; })
-	.attr('fill', function(d) { return d.color; })
+	// .attr('fill', function(d) { return d.color; })
+	.attr("xlink:href", "static/boat.png")
 	.attr("class", "ship")
 	.call(drag)
 	.on('click', function(){
@@ -180,6 +149,7 @@ function changeDirection(d) {
 			let w = d.width;
 			let h = d.height;
 			d3.select(this)
+				.attr("translate", "rotate(0)")
 				.attr("x", function (d) { return d.x + (d.width / 2 - d.height / 2) })
 				.attr("y", function (d) { return d.y - (d.width / 2 - d.height / 2) })
 				.attr("width", h)
@@ -193,6 +163,7 @@ function changeDirection(d) {
 			let w = d.width;
 			let h = d.height;
 			d3.select(this)
+				.attr("translate", "rotate(0)")
 				.attr("x", function (d) { return d.x - (d.height / 2 - d.width / 2) })
 				.attr("y", function (d) { return d.y + (d.height / 2 - d.width / 2) })
 				.attr("width", h)
@@ -206,16 +177,3 @@ function changeDirection(d) {
 		magnet(d, d3.select(this));
     	defineLimits(d, d3.select(this));
 	}
-
-// On affiche une boîte de dialogue quand le serveur nous envoie un "message"
-socket.on('message', function(message) {
-	console.log(message);
-    d3.select("#g2" + message)
-        .style("fill", "red");
-});
-
-let x = function(i) {
-	return {
-		p : i
-	}
-}
