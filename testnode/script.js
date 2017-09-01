@@ -71,10 +71,33 @@ let drag = d3.behavior.drag()
     .on('dragstart', function(d){
         console.log('drag start');
     })
-    .on('dragend', function(d){
+    .on('dragend', function(d, i){
     	magnet(d, d3.select(this));
+    	// if (collision(d, d3.select(this))) {
+    	// 	d3.select(this)
+    	// 		.attr("x", initialData[i].x)
+    	// 		.attr("y", initialData[i].y);
+    	// 	d.x = initialData[i].x;
+    	// 	d.y = initialData[i].y;
+    	// }
         console.log('drag end');
     });
+
+// let collision = function(d, object) {
+// 	let result = data.filter(x => intersects(d, x));
+// 	if (result !== undefined)
+// 		return true;
+// 	return false;
+// }
+
+// function intersects(current, other) {
+// 	if (current.dir == "v" && other.dir == "h") {
+// 		if (current.x >= other.x && current.x <= other.x + other.width
+// 			&& current.y <= other.y && current.y >= other.y + other.height)
+// 			return other;
+// 	}
+// 	return undefined;
+// }
 
 let magnet = function(d, object) {
 	let x0 = d.x;
@@ -105,19 +128,29 @@ let defineLimits = function(d, object) {
 }
     
 
-let data = [
+let initialData = [
 	{x : 10, y : 310, width : 2 * z, height : z, dir : "h", color : "maroon", img : "boat.png"},
 	{x : 10, y : 342, width : 3 * z, height : z, dir : "h", color : "chartreuse"},
 	{x : 10, y : 374, width : 3 * z, height : z, dir : "h", color : "darkgreen"},
 	{x : 10, y : 406, width : 4 * z, height : z, dir : "h", color : "darkorange"},
 	{x : 10, y : 438, width : 5 * z, height : z, dir : "h", color : "gold"}
 	];
+
+let data = [];
+initialData.map(item => data.push({
+	x : item.x, 
+	y : item.y, 
+	width : item.width, 
+	height : item.height, 
+	dir : item.dir, 
+	color : item.color
+}));
 // svg1.append('rect')
 //   .attr('width', w)
 //   .attr('height', h)
 //   .attr('fill', '#cc99ff');
   
-svg2.selectAll('.battle')
+svg2.selectAll('.ship')
 	.data(data)
 	.enter()
 	.append('rect')
@@ -126,7 +159,7 @@ svg2.selectAll('.battle')
 	.attr('width', function(d){ return d.width; }) 
 	.attr('height', function(d){ return d.height; })
 	.attr('fill', function(d) { return d.color; })
-	.attr("class", "battle")
+	.attr("class", "ship")
 	.call(drag)
 	.on('click', function(){
 		console.log('clicked');
@@ -152,12 +185,12 @@ function changeDirection(d) {
 			let w = d.width;
 			let h = d.height;
 			d3.select(this)
-				.attr("x", function (d) { return d.x - (d.width / 2 - d.height / 2) })
-				.attr("y", function (d) { return d.y + (d.width / 2 - d.height / 2) })
+				.attr("x", function (d) { return d.x - (d.height / 2 - d.width / 2) })
+				.attr("y", function (d) { return d.y + (d.height / 2 - d.width / 2) })
 				.attr("width", h)
 				.attr("height", w);
-			d.x = d.x - (d.width / 2 - d.height / 2);
-			d.y = d.y + (d.width / 2 - d.height / 2);
+			d.x = d.x - (d.height / 2 - d.width / 2);
+			d.y = d.y + (d.height / 2 - d.width / 2);
 			d.width = h;
 			d.height = w;
 			d.dir = "h";
