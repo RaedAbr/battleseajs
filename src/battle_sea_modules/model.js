@@ -66,15 +66,27 @@ function MapShip(rows, columns, ships) {
 }
 
 // Represent a player with his name, his map and the opponent's map
-function Player(name, ownMap, opponentMap) {
+
+function PlayerFull(name, ownMap, opponentMap) {
 	return {
 		getName: () => name,
 		getOwnMap: () => ownMap,
 		getOpponentMap: () => opponentMap,
 		toString: function() {
-			return "Player : " + name + ", \nownMap : " + ownMap.toString() + ", \nopponentMap : " 
-			+ opponentMap.toString();
+			return "[PlayerFull : " + name + ", \nownMap : " + ownMap.toString() + ", \nopponentMap : " 
+			+ opponentMap.toString() + "]";
 		}
+	};
+}
+
+function Player(name, w, socketId) {
+	let waiting = w;
+	return {
+		getName: () => name,
+		getSocketId: () => socketId,
+		isWaiting: () => waiting,
+		setWaiting: (val) => waiting = val,
+		toString: () => "[Player : " + name + ", socketId : " + socketId + ", isWaiting : " + waiting + "]"
 	};
 }
 
@@ -84,5 +96,6 @@ exports.Cell = (id) => Cell(id);
 exports.Ship = (name, startCell, endCell, rowsCols) => Ship(name, startCell, endCell, rowsCols);
 exports.Map = (rows, columns) => Map(rows, columns);
 exports.MapShip = (rows, columns, ships) => MapShip(rows, columns, ships);
-exports.Player = (name, ownMap, opponentMap) => Player(name, ownMap, opponentMap);
+exports.PlayerFull = (name, ownMap, opponentMap) => Player(name, ownMap, opponentMap);
+exports.Player = (name, w, socketId) => Player(name, w, socketId);
 

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>wait.html</title>
+</head>
+<body>
+	<h1 id="title">Wait Room</h1>
+
+	<p id="you">Waiting ...</p>
+	<p id="opponent">Waiting ...</p>
+
+	<!-- <script src="/model.js"></script> -->
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+		// let model = require("model.js");
+		// console.log(model.states());
+		let playerName = prompt("Player name :");
+		let socket = io("/wait");
+		socket.emit("playerName", playerName);
+		socket.on("you", function(data) {
+			document.getElementById("you").innerHTML = "<strong>You : </strong> " + JSON.parse(data);
+		});
+		socket.on("gameStart", function(data) {
+			document.getElementById("title").innerHTML = "In Game";
+			document.getElementById("opponent").innerHTML = "<strong>Opponent : </strong> " + JSON.parse(data);
+		});
+	</script>
+</body>
+</html>
