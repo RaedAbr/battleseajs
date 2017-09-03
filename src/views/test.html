@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Test</title>
+</head>
+<body>
+
+	<p id="playerName"></p>
+
+	<p><button id="creategame">Create Game</button></p>
+	<p id="gamecreated"></p>
+
+	<p><button id="joingame">Join Game</button></p>
+
+	<p id="play"></p>
+	
+	<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+		let socket = io.connect("http://localhost:8080");
+
+		let gameId = undefined;
+		let playerName = prompt("Player name :")
+		socket.emit("joinserver", playerName);
+		$("#playerName").text(playerName);
+
+		$("#creategame").on("click", function() {
+			socket.emit("creategame", playerName);
+		});
+		socket.on("creategame", function(id) {
+			gameId = id;
+			$("#gamecreated").text("Game id : " + id);
+		});
+
+		$("#joingame").on("click", function() {
+			socket.emit("joingame");
+		});
+		socket.on("play", function(id) {
+			$("#play").text("Play on " + id);
+		});
+
+	</script>
+
+</body>
+</html>
