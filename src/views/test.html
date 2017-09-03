@@ -6,12 +6,14 @@
 <body>
 
 	<p id="playerName"></p>
+	<p id="people"></p>
 
-	<p><button id="creategame">Create Game</button></p>
-	<p id="gamecreated"></p>
+	<p id="games"></p>
+	<p><button id="createGame">Create Game</button></p>
+	<p id="gameCreated"></p>
 
 	<p><input type="text" name="gameId" id="gameId" placeholder="Enter id received"></p>
-	<p><button id="joingame">Join Game</button></p>
+	<p><button id="joinGame">Join Game</button></p>
 
 	<p id="play"></p>
 	
@@ -21,24 +23,31 @@
 		let socket = io.connect("http://localhost:8080");
 
 		let playerName = prompt("Player name :")
-		socket.emit("joinserver", playerName);
+		socket.emit("joinServer", playerName);
 		$("#playerName").text(playerName);
 
-		$("#creategame").on("click", function() {
-			socket.emit("creategame");
-		});
-		socket.on("creategame", function(id) {
-			$("#gamecreated").text("Game id : " + id);
+		socket.on("people", function(people) {
+			$("#people").text("People : " + people);
 		});
 
-		$("#joingame").on("click", function() {
+		socket.on("games", function(games) {
+			$("#games").text("Games : " + games);
+		});
+
+		$("#createGame").on("click", function() {
+			socket.emit("createGame");
+		});
+		socket.on("createGame", function(id) {
+			$("#gameCreated").text("Game id : " + id);
+		});
+
+		$("#joinGame").on("click", function() {
 			let gameId = $.trim($('#gameId').val());
-			console.log(gameId);
 			if(gameId === "") {
-				socket.emit("joingame");
+				socket.emit("joinGame");
 			}
 			else {
-				socket.emit("joingameid", gameId);
+				socket.emit("joinGameId", gameId);
 			}
 		});
 		socket.on("play", function(id) {
