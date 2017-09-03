@@ -10,6 +10,7 @@
 	<p><button id="creategame">Create Game</button></p>
 	<p id="gamecreated"></p>
 
+	<p><input type="text" name="gameId" id="gameId" placeholder="Enter id received"></p>
 	<p><button id="joingame">Join Game</button></p>
 
 	<p id="play"></p>
@@ -19,21 +20,26 @@
 	<script>
 		let socket = io.connect("http://localhost:8080");
 
-		let gameId = undefined;
 		let playerName = prompt("Player name :")
 		socket.emit("joinserver", playerName);
 		$("#playerName").text(playerName);
 
 		$("#creategame").on("click", function() {
-			socket.emit("creategame", playerName);
+			socket.emit("creategame");
 		});
 		socket.on("creategame", function(id) {
-			gameId = id;
 			$("#gamecreated").text("Game id : " + id);
 		});
 
 		$("#joingame").on("click", function() {
-			socket.emit("joingame");
+			let gameId = $.trim($('#gameId').val());
+			console.log(gameId);
+			if(gameId === "") {
+				socket.emit("joingame");
+			}
+			else {
+				socket.emit("joingameid", gameId);
+			}
 		});
 		socket.on("play", function(id) {
 			$("#play").text("Play on " + id);

@@ -43,41 +43,6 @@ app.all("*", function(req, res) {
 });
 
 // ------------------------ sockets ------------------------
-let clientCounter = 1;
-let wait = io.of("/wait");
-
-let playerOne = undefined;
-let playerTwo = undefined;
-
-wait.on("connection", function(socket) {
-	function newPlayer(name, waiting, socketId) {
-		let player = model.Player(name, waiting, socket.id);
-		log.debug("Client n° " + clientCounter + " connected, " + player.toString());
-		socket.emit("you", JSON.stringify(player.toString()));
-		clientCounter++;
-		return player;
-	}
-
-	if (clientCounter === 1) {
-		socket.on("playerName", function(name) {
-			playerOne = newPlayer(name, true);
-		});
-	}
-	else if (clientCounter === 2) {
-		socket.on("playerName", function(name) {
-			playerTwo = newPlayer(name, false);
-			// wait.emit("gameStart"); // pour envoyer à tous les clients connectés à "/wait"
-			log.debug("gameStart");
-			// socket.to(playerTwo.getSocketId()).emit("gameStart", JSON.stringify(playerOne.toString()));
-			socket.emit("gameStart", JSON.stringify(playerOne.toString()));
-			log.debug("send to playerTwo");
-			socket.to(playerOne.getSocketId()).emit("gameStart", JSON.stringify(playerTwo.toString()));
-			log.debug("send to playerOne");
-		});
-	}
-});
-
-// ______________________________________________________________________________________________________________________-----------
 
 function People(id, name) {
 	return {
@@ -123,6 +88,16 @@ io.on("connection", function(socket) {
 		log.debug(games[gameId]);
 	}
 
+	function joinGame(id) {
+		games[id].iDplayerTwo = socket.id;
+		games[id].status = "play";
+		socket.join(id);
+		socket.emit("play", id);
+		socket.to(id).emit("play", id);
+		log.debug(people[socket.id].name + " join game :");
+		log.debug(games[id]);
+	}
+
 	socket.on("joinserver", function(name) {
 		people[socket.id] = People(socket.id, name);
 		log.debug("A new person connected : " + people[socket.id].toString());
@@ -140,18 +115,13 @@ io.on("connection", function(socket) {
 		}
 		else {
 			log.debug("in else joingame");
-			games[lastGameId].iDplayerTwo = socket.id;
-			games[lastGameId].status = "play";
-			// socket.emit("play");
-			// socket.to(lastGameId.iDplayerOne).emit("play");
-			socket.join(lastGameId);
-			socket.emit("play", lastGameId);
-			socket.to(lastGameId).emit("play", lastGameId);
-			log.debug(people[socket.id].name + " join game :");
-			log.debug(games[lastGameId]);
-			log.debug(socket.rooms);
+			joinGame(lastGameId);
 			lastGameId = undefined;
 		}
+	});
+
+	socket.on("joingameid", function(id) {
+		joinGame(id);
 	});
 
 	socket.on("listgames", function() {
