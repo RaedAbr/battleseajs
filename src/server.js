@@ -14,8 +14,9 @@ const modulesFolder = "/battle_sea_modules";
 http.listen(8080);
 
 // ------------------------ routes ------------------------
-app.use("/static", express.static(path.join(__dirname, "static")));
-app.get("/", function(req, res) {
+app.use("/static", express.static(path.join(__dirname, "static")))
+
+.get("/", function(req, res) {
 	log.debug("Request index.html");
 	res.sendFile(path.join(__dirname + viewsFolder + "/index.html"));
 })
@@ -23,11 +24,8 @@ app.get("/", function(req, res) {
 	log.debug("Request model.js");
 	res.sendFile(path.join(__dirname + modulesFolder + "/model.js"));
 })
-.get("/test", function(req, res) {
-	log.debug("Request test.html");
-	res.sendFile(path.join(__dirname + viewsFolder + "/test.html"));
-});
-app.all("*", function(req, res) {
+
+.all("*", function(req, res) {
 	log.error("Requested:", req.url);
 	res.status(404).send("404 Page not found.");
 });

@@ -24,44 +24,44 @@ function drawShips(data, svg) {
 		.on('dragend', function(d, i){
 			if (d.state == "in")
 				magnet(d, d3.select(this));
-	   //  	if (collision(d, d3.select(this))) {
-	   //  		d3.select(this)
-	   //  			.attr("x", initialShipData[i].x)
-	   //  			.attr("y", initialShipData[i].y)
-	   //  			.attr("width", initialShipData[i].width)
-	   //  			.attr("height", initialShipData[i].height)
+		//	if (collision(d, d3.select(this))) {
+		//		d3.select(this)
+		//			.attr("x", initialShipData[i].x)
+		//			.attr("y", initialShipData[i].y)
+		//			.attr("width", initialShipData[i].width)
+		//			.attr("height", initialShipData[i].height)
 				// 	.attr("xlink:href", function(d){ return initialShipData[i].img[initialShipData[i].dir]; });
 				// d.x = initialShipData[i].x;
 				// d.y = initialShipData[i].y;
 				// d.width = initialShipData[i].width;
 				// d.height = initialShipData[i].height;
 				// d.dir = initialShipData[i].dir;
-	   //  	}
+		//	}
 			console.log('drag end');
 		});
 
-let removeOldCells = function(ship) {
-	oldCells = clone(ship.cells);
-	oldCells.forEach(cell => filledCells.forEach(function(d, i) {
-		if (cell == d) {
-			filledCells.splice(i, 1);
-		}
-	}));
-}
+	let removeOldCells = function(ship) {
+		oldCells = clone(ship.cells);
+		oldCells.forEach(cell => filledCells.forEach(function(d, i) {
+			if (cell == d) {
+				filledCells.splice(i, 1);
+			}
+		}));
+	}
 
-let startBlink = function(shipView) {
-	shipView.transition()
-		.each("start", function repeat() {
-			d3.select(this)
-			.transition()
-			.duration(300)
-			.style("opacity", 0.3)
-			.transition()
-			.duration(300)
-			.style("opacity", 1)
-			.each("end", repeat);
-		});
-}
+	let startBlink = function(shipView) {
+		shipView.transition()
+			.each("start", function repeat() {
+				d3.select(this)
+				.transition()
+				.duration(300)
+				.style("opacity", 0.3)
+				.transition()
+				.duration(300)
+				.style("opacity", 1)
+				.each("end", repeat);
+			});
+	}
 
 	// let collision = function(d, object) {
 	// 	let result = shipData.filter(x => intersects(d, x));
