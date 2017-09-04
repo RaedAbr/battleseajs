@@ -1,34 +1,31 @@
 const model = require("./model.js");
 
-function print(arg) {
-	console.log(arg);
-}
+console.log("Test Cell");
+const cell = model.Cell(42);
+console.log(cell.toString());
+console.log(cell.setState(model.states[1]).toString());
+console.log(cell.setState(model.states[2]).toString());
 
-print(model.rowsColumns());
+console.log("\nTest Ship");
+const ship = model.Ship("Cruiser", [34, 35, 36, 37]);
+console.log(ship.toString());
 
-print("Test Cell");
-const cell = model.Cell(0);
-print(cell.toString());
-print(cell.setState("striked").toString());
+console.log("\nTest Map");
+const map = model.Map(model.rowsColumns, model.rowsColumns);
+console.log(map.toString());
 
-print("\nTest Ship");
-const ships = [
-	model.Ship("Carrier", 4, 8, model.rowsColumns()),
-	model.Ship("Battleship", 2, 32, model.rowsColumns()),
-	model.Ship("Cruiser", 45, 47, model.rowsColumns()),
-	model.Ship("Submarine", 58, 78, model.rowsColumns()),
-	model.Ship("Destroyer", 61, 62, model.rowsColumns())
-];
-ships.forEach(ship => print(ship.toString()));
+const ships = [ship, model.Ship("Submamodel.rine", [3, 13, 23]), model.Ship("Destroyer", [56, 57, 58])];
+console.log(ships);
 
-print("\nTest Map");
-const map = model.Map(model.rowsColumns(), model.rowsColumns());
-print(map.toString());
+console.log("\nTest MapShip");
+const mapShip = model.MapShip(model.rowsColumns, model.rowsColumns, ships);
+console.log(mapShip.toString());
 
-print("\nTest MapShip");
-const mapShip = model.MapShip(model.rowsColumns(), model.rowsColumns(), ships);
-print(mapShip.toString());
+console.log("\nTest People");
+const people = model.People(42, "bob");
+console.log(people.toString());
 
-print("\nTest Player");
-const player = model.Player("Bob", mapShip, map);
-print(player.toString());
+console.log("\nTest Game");
+const game = model.Game(56, people.id, true);
+console.log(game);
+console.log(game.toString());

@@ -5,38 +5,27 @@ const rowsColumns = Number(10);
 
 // Represent a cell on the map
 function Cell(id) {
-	let state = states[0];
+	// let state = states[0];
 	let c = {
-		getId: () => id, // idem to function() { return id; }
-		getState: () => state,
-		setState: function(s) { state = s; return c; },
+		id: id,
+		state: states[0],
+		setState: function(s) { this.state = s; return c; },
 		toString: function() {
-			return "[Cell " + this.getId() + ", " + this.getState() + "]";
+			return "(Cell : {id: " + this.id + ", state: " + this.state + "})";
 		}
 	};
 	return c;
 }
 
 // Represent a ship on map
-function Ship(name, startCell, endCell, rowsCols) {
+function Ship(name, cells) {
 	return {
-		getName: () => name,
-		getStartCell: () => startCell,
-		getEndCell: () => endCell,
-		getCellsNumber: function() {
-			let size = Number(Math.abs(endCell - startCell));
-			if (size < Number(rowsCols)) {
-				return size + 1;
-			}
-			else {
-				return size / rowsCols + 1;
-			}
-		},
+		name: name,
+		cells: cells,
 		toString: function() {
-			return "[Ship : " + name + " with " + this.getCellsNumber() + 
-			" cells, in position (" + startCell + ", " + endCell + ")]";
+			return "(Ship : {name: " + this.name + ", cells: " + this.cells + "})";
 		}
-	}
+	};
 }
 
 // Represent a map of cells (without ships)
@@ -48,9 +37,9 @@ function Map(rows, columns) {
 		i++;
 	}
 	return {
-		getCells: () => cells,
+		cells: cells,
 		toString: function() {
-			return "[Map : " + cells.toString() + "]";
+			return "(Map : {cells: " + this.cells.toString() + "})";
 		}
 	}
 }
@@ -60,29 +49,45 @@ function MapShip(rows, columns, ships) {
 	let m = Map(rows, columns);
 	m.ships = ships;
 	m.toString = function() {
-		return "[Map : \n\tShips : " + ships.toString() + "\n\tCells : " + this.getCells().toString() + "]";
+		return "(MapShip : {Ships : " + ships.toString() + ", Cells : " + this.cells.toString() + "})";
 	}
 	return m;
 }
 
-// Represent a player with his name, his map and the opponent's map
-function Player(name, ownMap, opponentMap) {
+// Represent a player or a viewer
+function People(id, name) {
 	return {
-		getName: () => name,
-		getOwnMap: () => ownMap,
-		getOpponentMap: () => opponentMap,
+		id: id,
+		name: name,
 		toString: function() {
-			return "Player : " + name + ", \nownMap : " + ownMap.toString() + ", \nopponentMap : " 
-			+ opponentMap.toString();
+			return "(People : {id: " + this.id + ", name: " + this.name + "})";
 		}
 	};
 }
 
-exports.states = () => states;
-exports.rowsColumns = () => rowsColumns;
+// Represent a game between two players
+function Game(id, iDplayerOne, free) {
+	return {
+		id: id,
+		iDplayerOne: iDplayerOne,
+		iDplayerTwo: undefined,
+		status: "wait",
+		free: free,
+		viewers: [],
+		toString: function() {
+			return "(Game : {id: " + this.id + ", iDplayerOne: " + this.iDplayerOne 
+				+ ", iDplayerTwo: " + this.iDplayerTwo + ", status:" + this.status 
+				+ ", free: " + this.free 
+				+ "})"; 
+		}
+	};
+}
+
+exports.states = states;
+exports.rowsColumns = rowsColumns;
 exports.Cell = (id) => Cell(id);
-exports.Ship = (name, startCell, endCell, rowsCols) => Ship(name, startCell, endCell, rowsCols);
+exports.Ship = (name, cells) => Ship(name, cells);
 exports.Map = (rows, columns) => Map(rows, columns);
 exports.MapShip = (rows, columns, ships) => MapShip(rows, columns, ships);
-exports.Player = (name, ownMap, opponentMap) => Player(name, ownMap, opponentMap);
-
+exports.People = (id, name) => People(id, name);
+exports.Game = (id, iDplayerOne, free) => Game(id, iDplayerOne, free);
