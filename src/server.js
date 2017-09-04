@@ -13,7 +13,7 @@ const modulesFolder = "/battle_sea_modules";
 
 http.listen(8080);
 
-// ------------------------ routes ------------------------
+// ------------------------------ routes ------------------------------
 app.use("/static", express.static(path.join(__dirname, "static")))
 
 .get("/", function(req, res) {
@@ -31,13 +31,14 @@ app.use("/static", express.static(path.join(__dirname, "static")))
 });
 
 
-// ------------------------ sockets ------------------------
+// ------------------------------ sockets ------------------------------
 let people = {};
 let games = {};
 let gameIdOnHold = undefined;
+// let maps = {};
 
 io.on("connection", function(socket) {
-	// ------------------------------ Socket's functions ------------------------------
+	// ------------------------------------ Socket's functions ------------------------------------
 	function peoplesList() {
 		io.emit("people", Object.keys(people).map(key => people[key].name)); // emit to all socket in all rooms
 	}
@@ -51,6 +52,7 @@ io.on("connection", function(socket) {
 		let gameId = uuidv4();
 		games[gameId] = model.Game(gameId, socket.id, free);
 		socket.join(gameId);
+		people[socket.id].gameId = gameId;
 		if (free) {
 			gameIdOnHold = gameId;
 		}
@@ -68,6 +70,7 @@ io.on("connection", function(socket) {
 			games[id].iDplayerTwo = socket.id;
 			games[id].status = "play";
 			socket.join(id);
+			people[socket.id].gameId = id;
 			io.to(id).emit("play", id); // emit to all socket in the room "id"
 			log.debug(people[socket.id].name + " join game :");
 			log.debug(games[id]);
@@ -77,7 +80,7 @@ io.on("connection", function(socket) {
 		}
 	}
 
-	// ------------------------------ Socket's events ------------------------------
+	// ------------------------------------ Socket's events ------------------------------------
 	socket.on("joinServer", function(name) {
 		people[socket.id] = model.People(socket.id, name);
 		peoplesList();
@@ -103,6 +106,13 @@ io.on("connection", function(socket) {
 
 	socket.on("joinGameId", function(id) {
 		joinGame(id);
+	});
+
+	socket.on("readyToStart", function(map) {
+		log.debug("in readyToStart");
+		log.debug(socket.id);
+		log.debug(people[socket.id].gameId);
+		// games[]
 	});
 
 	socket.on("viewGame", function(id) {

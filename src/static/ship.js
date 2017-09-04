@@ -47,7 +47,7 @@ function drawShips(data, svg) {
 				filledCells.splice(i, 1);
 			}
 		}));
-	}
+	};
 
 	let startBlink = function(shipView) {
 		shipView.transition()
@@ -61,7 +61,7 @@ function drawShips(data, svg) {
 				.style("opacity", 1)
 				.each("end", repeat);
 			});
-	}
+	};
 
 	// let collision = function(d, object) {
 	// 	let result = shipData.filter(x => intersects(d, x));
@@ -84,14 +84,14 @@ function drawShips(data, svg) {
 		.data(data)
 		.enter()
 		.append('image')
-		.attr('x', function(d){ return d.x; })
-		.attr('y', function(d){ return d.y; })
-		.attr('width', function(d){ return d.width; }) 
-		.attr('height', function(d){ return d.height; })
-		.attr("xlink:href", function(d){ return d.img[d.dir]; })
+		.attr('x', function(d) { return d.x; })
+		.attr('y', function(d) { return d.y; })
+		.attr('width', function(d) { return d.width; }) 
+		.attr('height', function(d) { return d.height; })
+		.attr("xlink:href", function(d) { return d.img[d.dir]; })
 		.attr("class", "ship")
 		.call(drag)
-		.on('click', function(){
+		.on('click', function() {
 			console.log('clicked');
 		})
 		.on("contextmenu", changeDirection);
@@ -114,7 +114,7 @@ function drawShips(data, svg) {
 			.attr("height", d.height);
 		defineLimits(d, d3.select(this));
 		magnet(d, d3.select(this));
-	}
+	};
 
 	let defineLimits = function (d, object) {
 		if (d.state == "in") {
@@ -131,7 +131,7 @@ function drawShips(data, svg) {
 				d.y = mapW - d.height;
 			}
 		}
-	}
+	};
 
 	let magnet = function(d, object) {
 		d.x = Math.round(d.x / z) * z;
@@ -140,7 +140,7 @@ function drawShips(data, svg) {
 
 		// filledCells .push(d.x / z + d.y / z * 10);
 		updateShipCells(d, object);
-	}
+	};
 
 	let updateShipCells = function(ship, object) {
 		// removing old cells
@@ -174,7 +174,7 @@ function drawShips(data, svg) {
 		}
 
 		getReady();
-	}
+	};
 
 	let getReady = function () {
 		let unvalidShips = shipData.filter(e => !e.valid || e.valid == undefined);
@@ -186,10 +186,10 @@ function drawShips(data, svg) {
 				.attr("id", "readyButton")
 				.append("text")
 				.text("Ready")
-				.on("click", sendData);
+				.on("click", sendData());
 		} else {
 			d3.select("#buttonTd")
 				.selectAll("button").remove();
 		}
-	}
+	};
 }
