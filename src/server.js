@@ -34,62 +34,24 @@ app.all("*", function(req, res) {
 
 
 // ------------------------ sockets ------------------------
-function People(id, name) {
-	return {
-		id: id,
-		name: name,
-		toString: function() {
-			return "(People : {id: " + this.id + ", name: " + this.name + "})";
-		}
-	};
-}
-
-function Game(id, iDplayerOne, free) {
-	return {
-		id: id,
-		iDplayerOne: iDplayerOne,
-		status: "wait",
-		free: free,
-		viewers: [],
-		toString: function() { 
-			return 
-				"(Game : {id: " + this.id + ", iDplayerOne: " + this.iDplayerOne 
-				+ ", status:" + this.status + ", free: " + this.free 
-				+ "})"; 
-		}
-	};
-}
-
 let people = {};
 let games = {};
 let gameIdOnHold = undefined;
 
 io.on("connection", function(socket) {
-	function listPeople() {
-		let names = function() {
-			let n = [];
-			for (let key in people) {
-				n.push(people[key].name);
-			}
-			return n;
-		}();
-		io.emit("people", names); // broadcast to all socket in all rooms
+	// ------------------------------ Socket's functions ------------------------------
+	function peoplesList() {
+		io.emit("people", Object.keys(people).map(key => people[key].name)); // emit to all socket in all rooms
 	}
 
 	function listGames() {
-		let names = function() {
-			let n = [];
-			for (let key in games) {
-				n.push("[" + games[key].id + ", " + people[games[key].iDplayerOne].name + "]");
-			}
-			return n;
-		}();
-		io.emit("games", names);
+		io.emit("games", Object.keys(games).map(key => "[" + games[key].id + ", " + 
+			people[games[key].iDplayerOne].name + "]"));
 	}
 
 	function createGame(free) {
 		let gameId = uuidv4();
-		games[gameId] = Game(gameId, socket.id, free);
+		games[gameId] = model.Game(gameId, socket.id, free);
 		socket.join(gameId);
 		if (free) {
 			gameIdOnHold = gameId;
@@ -97,25 +59,30 @@ io.on("connection", function(socket) {
 		else {
 			socket.emit("createGame", gameId);
 		}
+		// io.emit("games", names);
 		listGames();
 		log.debug("A new game is created : ");
 		log.debug(games[gameId]);
 	}
 
 	function joinGame(id) {
-		games[id].iDplayerTwo = socket.id;
-		games[id].status = "play";
-		socket.join(id);
-		socket.emit("play", id);
-		socket.to(id).emit("play", id);
-		listGames();
-		log.debug(people[socket.id].name + " join game :");
-		log.debug(games[id]);
+		if (games[id].status !== "play") {
+			games[id].iDplayerTwo = socket.id;
+			games[id].status = "play";
+			socket.join(id);
+			io.to(id).emit("play", id); // emit to all socket in the room "id"
+			log.debug(people[socket.id].name + " join game :");
+			log.debug(games[id]);
+		}
+		else {
+			log.debug("in joinGame, game full");
+		}
 	}
 
+	// ------------------------------ Socket's events ------------------------------
 	socket.on("joinServer", function(name) {
-		people[socket.id] = People(socket.id, name);
-		listPeople();
+		people[socket.id] = model.People(socket.id, name);
+		peoplesList();
 		log.debug("A new person connected : " + people[socket.id].toString());
 	});
 
