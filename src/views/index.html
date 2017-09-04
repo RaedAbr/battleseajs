@@ -1,34 +1,25 @@
+
 <!DOCTYPE html>
-<html>
-<head>
-	<title>Test</title>
-	<link rel="stylesheet" href="static/style.css" type="text/css" />
-</head>
+<meta charset="utf-8">
+<title>Transform Transitions</title>
+<link rel="stylesheet" type="text/css" href="static/style.css">
 <body>
 	<h1>Battle sea JS</h1>
 	<table>
 		<tr>
 			<td>Adversary's map</td>
 			<td>Your map</td>
+			<td></td>
 		</tr>
 		<tr>
 			<td id="map1" class="map"></td>
 			<td id="map2" class="map"></td>
+			<td id="buttonTd"></td>
 		</tr>
 	</table>
-
-	<!-- <script src="static/test.js"></script> -->
 	<script src="http://d3js.org/d3.v3.min.js"></script>
-	<script src="static/map.js"></script>
-	<script src="static/script.js"></script>
 	<script src="/socket.io/socket.io.js"></script>
-	<!-- <script>
-		let playerName = prompt("Player name :")
-		let socket = io.connect("http://localhost:8080");
-		socket.emit("playerName", playerName);
-		socket.on("data", function (data) {
-			document.getElementById("playerName").innerHTML = "Player " + data.name + " connected (id : " + data.id + ")";
-		});
-	</script> -->
-</body>
-</html>
+	<script src="static/communicate.js"></script>
+	<script src="static/map.js"></script>
+	<script src="static/ship.js"></script>
+	<script src="static/script.js"></script>

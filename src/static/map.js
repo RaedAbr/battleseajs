@@ -1,8 +1,13 @@
 
 let map = function(id, num) {
     let svg = d3.select(id).append("svg")
-        .attr("width", mapW + 9)
-        .attr("height", mapH + 9);
+        .attr("width", mapW)
+        .attr("height", mapH);
+
+    svg.append("image")
+        .attr("href", "img/sea.jpg")
+        .attr("width", mapW)
+        .attr("height", mapW);
 
     svg.selectAll("rect")
         .data(d3.range(nb * nb))
@@ -13,7 +18,8 @@ let map = function(id, num) {
         .attr("transform", translate)
         .attr("width", z)
         .attr("height", z)
-        .style("fill", "steelblue");
+        .style("fill", "steelblue")
+        .style("opacity", ".5");
     return svg;
 }
 
