@@ -5,7 +5,7 @@ let map = function(id, num) {
         .attr("height", mapH);
 
     svg.append("image")
-        .attr("href", "img/sea.jpg")
+        .attr("href", "static/img/sea.jpg")
         .attr("width", mapW)
         .attr("height", mapW);
 

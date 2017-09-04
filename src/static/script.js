@@ -29,11 +29,11 @@ let svg2 = map("#map2", 2);
 
 /////////////////////////ships////////////////////////////////
 let shipData = [
-	{x : 10, y : 310, width : 2 * z, height : z, dir : "h", img : {"h" : "img/ship1h.png", "v" : "img/ship1v.png"}, cells : [], state : "out", valid : undefined},
-	{x : 10, y : 342, width : 3 * z, height : z, dir : "h", img : {"h" : "img/ship2h.png", "v" : "img/ship2v.png"}, cells : [], state : "out", valid : undefined},
-	{x : 10, y : 374, width : 3 * z, height : z, dir : "h", img : {"h" : "img/ship2h.png", "v" : "img/ship2v.png"}, cells : [], state : "out", valid : undefined},
-	{x : 10, y : 406, width : 4 * z, height : z, dir : "h", img : {"h" : "img/ship3h.png", "v" : "img/ship3v.png"}, cells : [], state : "out", valid : undefined},
-	{x : 10, y : 438, width : 5 * z, height : z, dir : "h", img : {"h" : "img/ship4h.png", "v" : "img/ship4v.png"}, cells : [], state : "out", valid : undefined}
+	{x : 10, y : 310, width : 2 * z, height : z, dir : "h", img : {"h" : "static/img/ship1h.png", "v" : "static/img/ship1v.png"}, cells : [], state : "out", valid : undefined},
+	{x : 10, y : 342, width : 3 * z, height : z, dir : "h", img : {"h" : "static/img/ship2h.png", "v" : "static/img/ship2v.png"}, cells : [], state : "out", valid : undefined},
+	{x : 10, y : 374, width : 3 * z, height : z, dir : "h", img : {"h" : "static/img/ship2h.png", "v" : "static/img/ship2v.png"}, cells : [], state : "out", valid : undefined},
+	{x : 10, y : 406, width : 4 * z, height : z, dir : "h", img : {"h" : "static/img/ship3h.png", "v" : "static/img/ship3v.png"}, cells : [], state : "out", valid : undefined},
+	{x : 10, y : 438, width : 5 * z, height : z, dir : "h", img : {"h" : "static/img/ship4h.png", "v" : "static/img/ship4v.png"}, cells : [], state : "out", valid : undefined}
 	];
 
 var clone = function( o ) {
