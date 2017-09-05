@@ -108,10 +108,11 @@ io.on("connection", function(socket) {
 		joinGame(id);
 	});
 
-	socket.on("readyToStart", function(map) {
+	socket.on("readyToStart", function(ships) {
 		log.debug("in readyToStart");
 		log.debug(socket.id);
 		log.debug(people[socket.id].gameId);
+		log.debug(ships);
 		// games[]
 	});
 

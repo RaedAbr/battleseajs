@@ -1,4 +1,16 @@
 let sendData = function() {
 	console.log("in sendData");
-	socket.emit("readyToStart", 42)
+	let data = [];
+	shipData.forEach(ship => data.push({
+		name : ship.name, 
+		cells : function() {
+			let cellsObject = [];
+			ship.cells.forEach(cell => cellsObject.push({
+				id : cell
+			}));
+			return cellsObject;
+		}()
+	}));
+	console.log(data);
+	socket.emit("readyToStart", data);
 };
