@@ -184,9 +184,12 @@ function drawShips(data, svg) {
 			d3.select("#buttonTd")
 				.append("button")
 				.attr("id", "readyButton")
+				.on("click", function() {
+					sendData();
+					d3.select(this).remove();
+				})
 				.append("text")
-				.text("Ready")
-				.on("click", sendData());
+				.text("Ready");
 		} else {
 			d3.select("#buttonTd")
 				.selectAll("button").remove();
