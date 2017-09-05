@@ -12,5 +12,5 @@ let sendData = function() {
 		}()
 	}));
 	console.log(data);
-	socket.emit("readyToStart", JSON.stringify(data));
+	socket.emit("ready", JSON.stringify(data));
 };

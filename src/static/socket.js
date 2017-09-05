@@ -28,7 +28,11 @@ $("#joinGame").on("click", function() {
 		socket.emit("joinGameId", gameId);
 	}
 });
-socket.on("play", function(id) {
-	$("#play").text("Play on " + id);
+socket.on("joined", function(id) {
+	$("#joined").text("Joined on " + id);
 	load();
+});
+
+socket.on("play", function(id) {
+	$("#play").text("Play ! Your turn");
 });
