@@ -112,7 +112,8 @@ io.on("connection", function(socket) {
 		log.debug("in readyToStart");
 		log.debug(socket.id);
 		log.debug(people[socket.id].gameId);
-		log.debug(ships);
+		people[socket.id].ships = JSON.parse(ships);
+		log.debug(people[socket.id].ships[0].name);
 		// games[]
 	});
 

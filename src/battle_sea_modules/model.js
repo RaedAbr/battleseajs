@@ -53,7 +53,7 @@ function People(id, name, ships) {
 		ships: ships,
 		toString: function() {
 			return "(People : {id: " + this.id + ", name: " + this.name + ", map: " + 
-			this.map.toString() + ", ships: " + this.ships.toString() + "})";
+			this.map.toString() + ", ships: " + this.ships + "})";
 		}
 	};
 }

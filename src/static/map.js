@@ -21,7 +21,7 @@ let map = function(id, num) {
 		.style("fill", "steelblue")
 		.style("opacity", ".5");
 	return svg;
-}
+};
 
 function translate(d) {
 	return "translate(" + (d % nb * z) + ", " + (Math.floor(d / nb) * z) + ")";
