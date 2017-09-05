@@ -66,12 +66,12 @@ io.on("connection", function(socket) {
 	}
 
 	function joinGame(id) {
-		if (games[id].status !== "play") {
+		if (games[id].status !== "joined") {
 			games[id].iDplayerTwo = socket.id;
-			games[id].status = "play";
+			games[id].status = "joined";
 			socket.join(id);
 			people[socket.id].gameId = id;
-			io.to(id).emit("play", id); // emit to all socket in the room "id"
+			io.to(id).emit("joined", id); // emit to all socket in the room "id"
 			log.debug(people[socket.id].name + " join game :");
 			log.debug(games[id]);
 		}
@@ -108,13 +108,23 @@ io.on("connection", function(socket) {
 		joinGame(id);
 	});
 
-	socket.on("readyToStart", function(ships) {
-		log.debug("in readyToStart");
-		log.debug(socket.id);
-		log.debug(people[socket.id].gameId);
+	socket.on("ready", function(ships) {
+		log.debug("in ready");
+		log.debug("id player : " + socket.id);
+		log.debug("gameId : " + people[socket.id].gameId);
+
 		people[socket.id].ships = JSON.parse(ships);
-		log.debug(people[socket.id].ships[0].name);
-		// games[]
+		log.debug(people[socket.id].ships.map(ship => ship.name));
+		people[socket.id].status = "ready";
+
+		let gameId = people[socket.id].gameId;
+		let statusOne = people[games[gameId].iDplayerOne].status;
+		let statusTwo = people[games[gameId].iDplayerTwo].status;
+		if (statusOne === "ready" && statusTwo === "ready") {
+			// io.to(gameId).emit("play");
+			games[gameId].status = "play";
+			io.to(games[gameId].iDplayerOne).emit("play");
+		}
 	});
 
 	socket.on("viewGame", function(id) {
