@@ -3,6 +3,8 @@ let mapW = 300,
 	z = 30,
 	nb = mapW / z;
 
+let gameStarted = false;
+
 let clone = function(o) {
 	return JSON.parse(JSON.stringify(o));
 };
@@ -23,19 +25,6 @@ function load() {
 		.on("mouseover", handleMouseOver)
 		.on("mouseout", handleMouseOut)
 		.on("click", handleMouseClick);
-
-	function handleMouseOver(d) {
-		d3.select(this).style("opacity", ".2");
-	}
-
-	function handleMouseOut(d) {
-		d3.select(this).style("opacity", ".5");
-	}
-
-	function handleMouseClick(d) {
-		d3.select(this).style("fill", "red");
-		console.log("from client " + d);
-	}
 
 	/////////////////////////////map2//////////////////////////////////////
 	let svg2 = map("#map2", 2);

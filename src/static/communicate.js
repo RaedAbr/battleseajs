@@ -9,7 +9,7 @@ let sendData = function() {
 				id : cell
 			}));
 			return cellsObject;
-		}()
+		}()	
 	}));
 	console.log(data);
 	socket.emit("readyToStart", JSON.stringify(data));

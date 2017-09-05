@@ -1,6 +1,7 @@
 function drawShips(data, svg) {
+	let enableContextMenuEvent = true;
 	let filledCells  = [];
-	let drag = d3.behavior.drag()
+	drag = d3.behavior.drag()
 		.on("drag", function(d) {
 			d.x += d3.event.dx;
 			d.y += d3.event.dy;
@@ -98,22 +99,24 @@ function drawShips(data, svg) {
 
 	function changeDirection(d) {
 		d3.event.preventDefault();
-		if (d.dir == "h") 
-			d.dir = "v";
-		else
-			d.dir = "h";
-		d3.select(this)
-			.attr("xlink:href", function(d){ return d.img[d.dir]; });
-		d.x += d.width / 2 - d.height / 2;
-		d.y -= d.width / 2 - d.height / 2;
-		let aux = d.width;
-		d.width = d.height;
-		d.height = aux;
-		d3.select(this)
-			.attr("width", d.width)
-			.attr("height", d.height);
-		defineLimits(d, d3.select(this));
-		magnet(d, d3.select(this));
+		if (enableContextMenuEvent) {
+			if (d.dir == "h") 
+				d.dir = "v";
+			else
+				d.dir = "h";
+			d3.select(this)
+				.attr("xlink:href", function(d){ return d.img[d.dir]; });
+			d.x += d.width / 2 - d.height / 2;
+			d.y -= d.width / 2 - d.height / 2;
+			let aux = d.width;
+			d.width = d.height;
+			d.height = aux;
+			d3.select(this)
+				.attr("width", d.width)
+				.attr("height", d.height);
+			defineLimits(d, d3.select(this));
+			magnet(d, d3.select(this));
+		}
 	};
 
 	let defineLimits = function (d, object) {
@@ -185,8 +188,16 @@ function drawShips(data, svg) {
 				.append("button")
 				.attr("id", "readyButton")
 				.on("click", function() {
+					drag.on("drag", null);
+					drag.on("dragstart", null);
+					drag.on("dragend", null);
+					svg.selectAll('.ship').selectAll('image').on("contextmenu", null);
 					sendData();
 					d3.select(this).remove();
+					enableContextMenuEvent = false;
+					socket.on("play", function() {
+						gameStarted = true;
+					});
 				})
 				.append("text")
 				.text("Ready");

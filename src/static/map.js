@@ -1,4 +1,3 @@
-
 let map = function(id, num) {
 	let svg = d3.select(id).append("svg")
 		.attr("width", mapW)
@@ -21,8 +20,27 @@ let map = function(id, num) {
 		.style("fill", "steelblue")
 		.style("opacity", ".5");
 	return svg;
-};
+}
 
 function translate(d) {
 	return "translate(" + (d % nb * z) + ", " + (Math.floor(d / nb) * z) + ")";
+}
+
+function handleMouseOver(d) {
+	if (gameStarted) {
+		d3.select(this).style("opacity", ".2");
+	}
+}
+
+function handleMouseOut(d) {
+	if (gameStarted) {
+		d3.select(this).style("opacity", ".5");
+	}
+}
+
+function handleMouseClick(d) {
+	if (gameStarted) {
+		d3.select(this).style("fill", "red");
+		console.log("from client " + d);
+	}
 }

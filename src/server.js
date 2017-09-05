@@ -84,7 +84,7 @@ io.on("connection", function(socket) {
 	socket.on("joinServer", function(name) {
 		people[socket.id] = model.People(socket.id, name, undefined);
 		peoplesList();
-		log.debug("A new person connected : " + people[socket.id].toString());
+		log.debug("A new person connected : " + people[socket.id].name);
 	});
 
 	socket.on("createGame", function() {
