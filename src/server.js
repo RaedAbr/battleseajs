@@ -82,7 +82,7 @@ io.on("connection", function(socket) {
 
 	// ------------------------------------ Socket's events ------------------------------------
 	socket.on("joinServer", function(name) {
-		people[socket.id] = model.People(socket.id, name);
+		people[socket.id] = model.People(socket.id, name, undefined);
 		peoplesList();
 		log.debug("A new person connected : " + people[socket.id].toString());
 	});

@@ -23,12 +23,12 @@ function Ship(name, cells) {
 		name: name,
 		cells: cells,
 		toString: function() {
-			return "(Ship : {name: " + this.name + ", cells: " + this.cells + "})";
+			return "(Ship : {name: " + this.name + ", cells: " + this.cells.toString() + "})";
 		}
 	};
 }
 
-// Represent a map of cells (without ships)
+// Represent a map of cells
 function Map(rows, columns) {
 	let cells = [];
 	let i = 0;
@@ -44,23 +44,16 @@ function Map(rows, columns) {
 	}
 }
 
-// Represent a map of cells (with ships)
-function MapShip(rows, columns, ships) {
-	let m = Map(rows, columns);
-	m.ships = ships;
-	m.toString = function() {
-		return "(MapShip : {Ships : " + ships.toString() + ", Cells : " + this.cells.toString() + "})";
-	}
-	return m;
-}
-
 // Represent a player or a viewer
-function People(id, name) {
+function People(id, name, ships) {
 	return {
 		id: id,
 		name: name,
+		map: Map(rowsColumns, rowsColumns),
+		ships: ships,
 		toString: function() {
-			return "(People : {id: " + this.id + ", name: " + this.name + "})";
+			return "(People : {id: " + this.id + ", name: " + this.name + ", map: " + 
+			this.map.toString() + ", ships: " + this.ships.toString() + "})";
 		}
 	};
 }
@@ -76,7 +69,7 @@ function Game(id, iDplayerOne, free) {
 		viewers: [],
 		toString: function() {
 			return "(Game : {id: " + this.id + ", iDplayerOne: " + this.iDplayerOne 
-				+ ", iDplayerTwo: " + this.iDplayerTwo + ", status:" + this.status 
+				+ ", iDplayerTwo: " + this.iDplayerTwo + ", status: " + this.status 
 				+ ", free: " + this.free 
 				+ "})"; 
 		}
@@ -88,6 +81,5 @@ exports.rowsColumns = rowsColumns;
 exports.Cell = (id) => Cell(id);
 exports.Ship = (name, cells) => Ship(name, cells);
 exports.Map = (rows, columns) => Map(rows, columns);
-exports.MapShip = (rows, columns, ships) => MapShip(rows, columns, ships);
-exports.People = (id, name) => People(id, name);
+exports.People = (id, name, ships) => People(id, name, ships);
 exports.Game = (id, iDplayerOne, free) => Game(id, iDplayerOne, free);

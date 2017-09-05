@@ -5,7 +5,7 @@ let mapW = 300,
 
 let clone = function(o) {
 	return JSON.parse(JSON.stringify(o));
-}
+};
 
 let shipData = [
 	{x : 10, y : 310, width : 2 * z, height : z, dir : "h", img : {"h" : "static/img/ship1h.png", "v" : "static/img/ship1v.png"}, cells : [], state : "out", valid : undefined},
