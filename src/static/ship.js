@@ -196,7 +196,7 @@ function drawShips(data, svg) {
 					d3.select(this).remove();
 					enableContextMenuEvent = false;
 					socket.on("play", function() {
-						gameStarted = true;
+						myTurn = true;
 					});
 				})
 				.append("text")

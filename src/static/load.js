@@ -3,7 +3,7 @@ let mapW = 300,
 	z = 30,
 	nb = mapW / z;
 
-let gameStarted = false;
+let myTurn = false;
 
 let clone = function(o) {
 	return JSON.parse(JSON.stringify(o));

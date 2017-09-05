@@ -27,21 +27,27 @@ function translate(d) {
 }
 
 function handleMouseOver(d) {
-	if (gameStarted) {
+	if (myTurn) {
 		d3.select(this).style("opacity", ".2");
 	}
 }
 
 function handleMouseOut(d) {
-	if (gameStarted) {
+	if (myTurn) {
 		d3.select(this).style("opacity", ".5");
 	}
 }
 
 function handleMouseClick(d) {
-	if (gameStarted) {
-		d3.select(this).style("fill", "red");
+	if (myTurn) {
+		// d3.select(this).style("fill", "red");
 		socket.emit("play", d);
 		console.log("from client " + d);
+		socket.on("response", function(resp) {
+			d3.select("g1" + resp.cellId)
+				.attr("fill", resp.cellColor)
+				.style("opacity", "1");
+		});
+		myTurn = false;
 	}
 }
