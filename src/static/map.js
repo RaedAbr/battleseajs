@@ -41,6 +41,7 @@ function handleMouseOut(d) {
 function handleMouseClick(d) {
 	if (gameStarted) {
 		d3.select(this).style("fill", "red");
+		socket.emit("play", d);
 		console.log("from client " + d);
 	}
 }

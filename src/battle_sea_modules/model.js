@@ -1,6 +1,6 @@
 "use strict";
 
-const states = ["free", "striked", "missed"];
+const states = ["free", "taken", "striked", "missed"];
 const rowsColumns = Number(10);
 
 // Represent a cell on the map
@@ -51,6 +51,7 @@ function People(id, name, ships) {
 		name: name,
 		map: Map(rowsColumns, rowsColumns),
 		ships: ships,
+		opponentId: undefined,
 		toString: function() {
 			return "(People : {id: " + this.id + ", name: " + this.name + ", map: " + 
 			this.map.toString() + ", ships: " + this.ships + "})";
