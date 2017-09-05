@@ -144,8 +144,20 @@ io.on("connection", function(socket) {
 		else {
 			firedCell.state = model.states[3];
 		}
-		console.log(people[opponentId].map.cells);
-		io.to(opponentId).emit("play");
+		console.log(people[opponentId].map.cells[cellId]);
+
+		let color = function() {
+			if (firedCell.state === model.states[2]) {
+				return "red";
+			}
+			if (firedCell.state === model.states[3]) {
+				return "green";
+			}
+		}();
+
+		let response = {cellId: firedCell.id, cellColor: color};
+		socket.emit("response", response);
+		io.to(opponentId).emit("play", response);
 	});
 
 	socket.on("viewGame", function(id) {
