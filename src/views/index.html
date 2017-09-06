@@ -26,11 +26,15 @@
 	<div id="gameContent">
 		<table>
 			<tr>
+				<td></td>
 				<td>Adversary's map</td>
 				<td>Your map</td>
 				<td></td>
 			</tr>
 			<tr>
+				<td>
+					<div id="history" style="overflow-y: auto;"></div>
+				</td>
 				<td id="map1" class="map"></td>
 				<td id="map2" class="map"></td>
 				<td id="buttonTd"></td>
@@ -43,6 +47,7 @@
 	<script src="static/map.js"></script>
 	<script src="static/ship.js"></script>
 	<script src="static/load.js"></script>
+	<script src="static/listeners.js"></script>
 
 	<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 	<script src="/socket.io/socket.io.js"></script>

@@ -196,9 +196,6 @@ function drawShips(data, svg) {
 					sendData();
 					d3.select(this).remove();
 					enableContextMenuEvent = false;
-					socket.on("play", function() {
-						myTurn = true;
-					});
 				})
 				.html("Ready");
 		} else {
@@ -232,7 +229,6 @@ function drawShips(data, svg) {
 			magnet(ship, d3.select("#ship" + ship.id));
 		});
 	}
-
 }
 
 /*

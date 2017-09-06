@@ -1,4 +1,4 @@
-let map = function(id, num) {
+let map = function(id, num, cellsData) {
 	let svg = d3.select(id).append("svg")
 		.attr("width", mapW)
 		.attr("height", mapH);
@@ -9,47 +9,46 @@ let map = function(id, num) {
 		.attr("height", mapW);
 
 	svg.selectAll("rect")
-		.data(d3.range(nb * nb))
+		.data(cellsData)
 		.enter().append("rect")
 		.attr("id", function (d) {
-			return "g" + num + d;
+			return "g" + num + d.id;
 		})
 		.attr("transform", translate)
 		.attr("width", z)
 		.attr("height", z)
-		.style("fill", "steelblue")
+		.attr("fill", "steelblue")
 		.style("opacity", ".5");
 	return svg;
 }
 
 function translate(d) {
-	return "translate(" + (d % nb * z) + ", " + (Math.floor(d / nb) * z) + ")";
+	return "translate(" + (d.id % nb * z) + ", " + (Math.floor(d.id / nb) * z) + ")";
 }
 
 function handleMouseOver(d) {
 	if (myTurn) {
-		d3.select(this).style("opacity", ".2");
+		if (d.state === "free") {
+			d3.select(this).style("opacity", ".2");
+		}
 	}
 }
 
 function handleMouseOut(d) {
 	if (myTurn) {
-		d3.select(this).style("opacity", ".5");
+		if (d.state === "free") {
+			d3.select(this).style("opacity", ".5");
+		}
 	}
 }
 
 function handleMouseClick(d) {
-	console.log(myTurn);
+	console.log(d);
 	if (myTurn) {
 		// d3.select(this).style("fill", "red");
-		socket.emit("play", d);
-		console.log("from client " + d);
-		socket.on("response", function(resp) {
-			console.log(resp);
-			d3.select("g1" + resp.cellId)
-				.style("fill", resp.cellColor)
-				.style("opacity", "1");
-			myTurn = false;
-		});
+		if (d.state === "free") {
+			socket.emit("play", d.id);
+			console.log("from client " + d.id);
+		}
 	}
 }
