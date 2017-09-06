@@ -199,11 +199,44 @@ function drawShips(data, svg) {
 						myTurn = true;
 					});
 				})
-				.append("text")
-				.text("Ready");
+				.html("Ready");
 		} else {
 			d3.select("#buttonTd")
 				.selectAll("button").remove();
 		}
 	};
+
+	function randomButton() {
+		d3.select("#buttonTd")
+			.append("button")
+			.html("Random")
+			.attr("id", "randomButton")
+			.on("click", function() {
+				randomShipPositions(data, svg);
+			});
+	}();
+}
+
+function randomShipPositions(data, svg) {
+	data.forEach(function(ship) {
+		if (getRndInteger(0, 1) === 0) {
+			ship.dir = "h";
+		} else {
+			ship.dir = "v";
+		}
+		ship.x = getRndInteger(0, mapW - ship.width);
+		ship.y = getRndInteger(0, mapW - ship.height);
+		magnet(ship, d3.select("ship" + ship.id));
+	});
+}
+
+/*
+	Function ( min : string, max : string )
+
+	Return Type: integer
+
+	Description: returns a random number between min and max (both included)
+*/
+function getRndInteger(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) ) + min;
 }
