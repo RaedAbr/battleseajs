@@ -19,12 +19,12 @@ function Cell(id) {
 }
 
 // Represent a ship on map
-function Ship(id, name, cells) {
+function Ship(id, name, cells, dir) {
 	return {
 		id: id,
 		name: name,
 		cells: cells,
-		status: "living",
+		dir: dir,
 		destroyedCells: 0,
 		isDestroyed: function() {
 			this.destroyedCells++;
@@ -32,7 +32,7 @@ function Ship(id, name, cells) {
 		},
 		toString: function() {
 			return "(Ship : {id: " + this.id + ", name: " + this.name + ", cells: " + this.cells.toString() + 
-			", status: " + this.status + ", destroyedCells: " + this.destroyedCells + "})\n";
+			", destroyedCells: " + this.destroyedCells + ", isDestroyed: " + this.isDestroyed() + "})\n";
 		}
 	};
 }
@@ -64,14 +64,14 @@ function People(id, name, ships) {
 		opponentId: undefined,
 		status: undefined,
 		destroyedShips: 0,
-		isLost: function() {
-			this.destroyedShips++;
+		hasLost: function() {
 			return this.destroyedShips >= this.ships.length;
 		},
 		toString: function() {
 			return "(People : {id: " + this.id + ", name: " + this.name + ", gameId: " + 
 			this.gameId + ", map: " + this.map.toString() + ", ships: " + this.ships + 
-			", opponentId: " + this.opponentId + ", status: " + this.status + "})";
+			", opponentId: " + this.opponentId + ", status: " + this.status + 
+			", hasLost: " + this.hasLost() + "})";
 		}
 	};
 }
@@ -97,7 +97,7 @@ function Game(id, iDplayerOne, free) {
 exports.states = states;
 exports.rowsColumns = rowsColumns;
 exports.Cell = (id) => Cell(id);
-exports.Ship = (id, name, cells) => Ship(id, name, cells);
+exports.Ship = (id, name, cells, dir) => Ship(id, name, cells, dir);
 exports.Map = (rows, columns) => Map(rows, columns);
 exports.People = (id, name, ships) => People(id, name, ships);
 exports.Game = (id, iDplayerOne, free) => Game(id, iDplayerOne, free);

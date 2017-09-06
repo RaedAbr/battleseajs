@@ -4,7 +4,8 @@ let sendData = function() {
 	shipData.forEach(ship => data.push({
 		id: ship.id,
 		name : ship.name, 
-		cells : ship.cells	
+		cells : ship.cells,
+		dir: ship.dir
 	}));
 	console.log(data);
 	socket.emit("ready", JSON.stringify(data));
