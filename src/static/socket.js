@@ -28,9 +28,9 @@ $("#joinGame").on("click", function() {
 		socket.emit("joinGameId", gameId);
 	}
 });
-socket.on("joined", function(id) {
-	$("#joined").text("Joined on " + id);
-	load();
+socket.on("joined", function(ids) {
+	$("#joined").text("Joined on " + ids.gameId);
+	load(ids.playerId);
 });
 
 socket.on("play", function(id) {

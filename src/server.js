@@ -35,16 +35,32 @@ app.use("/static", express.static(path.join(__dirname, "static")))
 let people = {};
 let games = {};
 let gameIdOnHold = undefined;
-// let maps = {};
+
+// ------------------------------ event's names ------------------------------
+const joinServer = "joinServer";
+const createGame = "createGame";
+const joinGame = "joinGame";
+const joinGameId = "joinGameId";
+const joined = "joined";
+const ready = "ready";
+const play = "play";
+const fireEvent = "fireEvent";
+const shipDestroyed = "shipDestroyed";
+const endGame = "endGame";
+
+const peopleList = "people";
+const listGames = "games";
+const viewGame = "viewGame";
+const listViewersInRoom = "listViewersInRoom";
 
 io.on("connection", function(socket) {
 	// ------------------------------------ Socket's functions ------------------------------------
-	function peoplesList() {
-		io.emit("people", Object.keys(people).map(key => people[key].name)); // emit to all socket in all rooms
+	function peopleList() {
+		io.emit(peopleList, Object.keys(people).map(key => people[key].name)); // emit to all socket in all rooms
 	}
 
 	function listGames() {
-		io.emit("games", Object.keys(games).map(key => "[" + games[key].id + ", " + 
+		io.emit(listGames, Object.keys(games).map(key => "[" + games[key].id + ", " + 
 			people[games[key].iDplayerOne].name + "]"));
 	}
 
@@ -57,7 +73,7 @@ io.on("connection", function(socket) {
 			gameIdOnHold = gameId;
 		}
 		else {
-			socket.emit("createGame", gameId);
+			socket.emit(createGame, gameId);
 		}
 		// io.emit("games", names);
 		listGames();
@@ -76,7 +92,9 @@ io.on("connection", function(socket) {
 
 			socket.join(id);
 			people[socket.id].gameId = id;
-			io.to(id).emit("joined", id); // emit to all socket in the room "id"
+			io.to(id).emit(joined, id); // emit to all socket in the room "id"
+			socket.emit(joined, {gameId: id, playerId: socket.id});
+			io.to(opponentId).emit(joined, {gameId: id, playerId: opponentId});
 			log.debug(people[socket.id].name + " join game :");
 			log.debug(games[id]);
 		}
@@ -86,18 +104,18 @@ io.on("connection", function(socket) {
 	}
 
 	// ------------------------------------ Socket's events ------------------------------------
-	socket.on("joinServer", function(name) {
+	socket.on(joinServer, function(name) {
 		people[socket.id] = model.People(socket.id, name, undefined);
-		peoplesList();
+		peopleList();
 		log.debug("A new person connected : " + people[socket.id].name);
 	});
 
-	socket.on("createGame", function() {
+	socket.on(createGame, function() {
 		log.debug("in createGame");
 		createGame(false);
 	});
 
-	socket.on("joinGame", function() {
+	socket.on(joinGame, function() {
 		if (gameIdOnHold === undefined) {
 			log.debug("in if joinGame");
 			createGame(true);
@@ -109,11 +127,11 @@ io.on("connection", function(socket) {
 		}
 	});
 
-	socket.on("joinGameId", function(id) {
+	socket.on(joinGameId, function(id) {
 		joinGame(id);
 	});
 
-	socket.on("ready", function(dataShips) {
+	socket.on(ready, function(dataShips) {
 		let player = people[socket.id];
 		log.debug("in ready");
 		log.debug("id player : " + player.id);
@@ -131,7 +149,7 @@ io.on("connection", function(socket) {
 				cells.push(cell);
 				player.map.cells[id] = cell;
 			});
-			ships.push(model.Ship(clientShip.id, clientShip.name, cells));
+			ships.push(model.Ship(clientShip.id, clientShip.name, cells, clientShip.dir));
 		});
 		player.ships = ships;
 		player.status = "ready";
@@ -142,48 +160,52 @@ io.on("connection", function(socket) {
 		let statusTwo = people[games[gameId].iDplayerTwo].status;
 		if (statusOne === "ready" && statusTwo === "ready") {
 			games[gameId].status = "play";
-			io.to(games[gameId].iDplayerOne).emit("play");
+			io.to(games[gameId].iDplayerOne).emit(play);
 		}
 	});
 
-	socket.on("play", function(cellId) {
+	socket.on(play, function(cellId) {
 		let continuousGame = true;
 		let opponentId = people[socket.id].opponentId;
 		let opponent = people[opponentId];
 		let firedCell = opponent.map.cells[cellId];
 		log.debug(firedCell.toString());
-		let color = undefined;
 		if (firedCell.state === model.states[1]) {
 			firedCell.state = model.states[2];
-			color = "red";
+			opponent.ships[firedCell.shipId].destroyedCells++;
+
 			if (opponent.ships[firedCell.shipId].isDestroyed()) {
-				log.debug("Ship destroyed ! " + firedCell.shipId);
-				if (opponent.isLost()) {
+				io.to(opponent.gameId).emit(shipDestroyed, {ship: opponent.ships[firedCell.shipId], 
+					player: {id: people[socket.id].id, name: people[socket.id].name}});
+				log.debug("Ship destroyed ! " + firedCell.shipId + ", " + opponent.ships[firedCell.shipId]);
+				opponent.destroyedShips++;
+
+				if (opponent.hasLost()) {
 					log.debug("player " + opponent.name + " has lost");
-					io.to(opponent.gameId).emit("endGame");
+					io.to(opponent.gameId).emit(endGame, {playerNameWin: people[socket.id].name, 
+						playerNameLoose: opponent.name});
 					continuousGame = false;
 				}
 			}
 		}
 		else {
 			firedCell.state = model.states[3];
-			color = "green";
 		}
 		log.debug(firedCell);
 
 		if (continuousGame) {
-			let response = {cellId: firedCell.id, cellColor: color};
-			socket.emit("response", response);
-			io.to(opponentId).emit("play", response);
+			io.to(opponent.gameId).emit(fireEvent, {cellId: firedCell.id, cellState: firedCell.state, 
+				player: {id: people[socket.id].id, name: people[socket.id].name}});
+			io.to(opponentId).emit(play);
 		}
 	});
 
-	socket.on("viewGame", function(id) {
+	socket.on(viewGame, function(id) {
 		games[id].viewers.push(id);
 		socket.join(id);
 	});
 
-	socket.on("listViewersInRoom", function(id) {
+	socket.on(listViewersInRoom, function(id) {
 		// let names = 
 		// socket.emit(JSON.stringify(people));
 	});
