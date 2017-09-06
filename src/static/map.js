@@ -33,9 +33,9 @@ function handleMouseOver(d) {
 }
 
 function handleMouseOut(d) {
-	// if (myTurn) {
-	// 	d3.select(this).style("opacity", ".5");
-	// }
+	if (myTurn) {
+		d3.select(this).style("opacity", ".5");
+	}
 }
 
 function handleMouseClick(d) {

@@ -85,6 +85,7 @@ function drawShips(data, svg) {
 		.data(data)
 		.enter()
 		.append('image')
+		.attr("id", function (d) { return "ship" + d.id; })
 		.attr('x', function(d) { return d.x; })
 		.attr('y', function(d) { return d.y; })
 		.attr('width', function(d) { return d.width; }) 
@@ -202,32 +203,36 @@ function drawShips(data, svg) {
 				.html("Ready");
 		} else {
 			d3.select("#buttonTd")
-				.selectAll("button").remove();
+				.selectAll("#readyButton").remove();
 		}
 	};
 
-	function randomButton() {
+	;(function(){
 		d3.select("#buttonTd")
 			.append("button")
 			.html("Random")
 			.attr("id", "randomButton")
 			.on("click", function() {
-				randomShipPositions(data, svg);
+				randomShipPositions(data);
 			});
-	}();
-}
+	})();
 
-function randomShipPositions(data, svg) {
-	data.forEach(function(ship) {
-		if (getRndInteger(0, 1) === 0) {
-			ship.dir = "h";
-		} else {
-			ship.dir = "v";
-		}
-		ship.x = getRndInteger(0, mapW - ship.width);
-		ship.y = getRndInteger(0, mapW - ship.height);
-		magnet(ship, d3.select("ship" + ship.id));
-	});
+	function randomShipPositions(data) {
+		data.forEach(function(ship) {
+				console.log(ship);
+			let rn = getRndInteger(0, 100);
+			if (rn < 50) {
+				ship.dir = "h";
+			} else {
+				ship.dir = "v";
+			}
+			ship.x = getRndInteger(0, mapW - ship.width);
+			ship.y = getRndInteger(0, mapW - ship.height);
+			
+			magnet(ship, d3.select("#ship" + ship.id));
+		});
+	}
+
 }
 
 /*
