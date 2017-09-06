@@ -16,13 +16,14 @@ function loadListeners(cellsData) {
 					return event.state === "missed" ? "green" : "red";
 				});
 		}
-		var currentDate = new Date();
+		var currentdate = new Date();
 		var dateTime = currentdate.getHours() + ":"  
 			+ currentdate.getMinutes() + ":" 
 			+ currentdate.getSeconds();
 		d3.select("#history")
 			.append("p")
 			.html(dateTime + " =>" + event.player.name + " " + event.state);
+		myTurn = false;
 	});
 
 	socket.on("shipDestroyed", function(event) {

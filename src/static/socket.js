@@ -22,9 +22,11 @@ socket.on("createGame", function(id) {
 $("#joinGame").on("click", function() {
 	let gameId = $.trim($('#gameId').val());
 	if(gameId === "") {
+		console.log("joinGame");
 		socket.emit("joinGame");
 	}
 	else {
+		console.log("joinGameId");
 		socket.emit("joinGameId", gameId);
 	}
 });

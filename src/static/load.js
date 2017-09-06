@@ -25,7 +25,7 @@ let shipData = [
 	{x : 10, y : 438, width : 5 * z, height : z, dir : "h", img : {"h" : "static/img/ship4h.png", "v" : "static/img/ship4v.png"}, cells : [], state : "out", valid : undefined, id : 4, name : "Battleship"}
 ];
 
-function load(GamePlayerId) {
+function load(gamePlayerId) {
 	playerId = gamePlayerId;
 	////////////////////////////map1/////////////////////////////////////////
 	let svg1 = map("#map1", 1, cellsData);

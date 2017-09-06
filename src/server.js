@@ -39,7 +39,7 @@ let gameIdOnHold = undefined;
 // ------------------------------ event's names ------------------------------
 const joinServer = "joinServer";
 const createGame = "createGame";
-const joinGame = "joinGame";
+const join = "joinGame";
 const joinGameId = "joinGameId";
 const joined = "joined";
 const ready = "ready";
@@ -92,7 +92,7 @@ io.on("connection", function(socket) {
 
 			socket.join(id);
 			people[socket.id].gameId = id;
-			io.to(id).emit(joined, id); // emit to all socket in the room "id"
+			// io.to(id).emit(joined, id); // emit to all socket in the room "id"
 			socket.emit(joined, {gameId: id, playerId: socket.id});
 			io.to(opponentId).emit(joined, {gameId: id, playerId: opponentId});
 			log.debug(people[socket.id].name + " join game :");
@@ -115,7 +115,7 @@ io.on("connection", function(socket) {
 		createGame(false);
 	});
 
-	socket.on(joinGame, function() {
+	socket.on(join, function() {
 		if (gameIdOnHold === undefined) {
 			log.debug("in if joinGame");
 			createGame(true);
