@@ -113,19 +113,31 @@ io.on("connection", function(socket) {
 		joinGame(id);
 	});
 
-	socket.on("ready", function(ships) {
+	socket.on("ready", function(dataShips) {
+		let player = people[socket.id];
 		log.debug("in ready");
-		log.debug("id player : " + socket.id);
-		log.debug("gameId : " + people[socket.id].gameId);
+		log.debug("id player : " + player.id);
+		log.debug("gameId : " + player.gameId);
 
-		people[socket.id].ships = JSON.parse(ships);
-		people[socket.id].ships.forEach(ship => ship.cells.
-			forEach(cell => people[socket.id].map.cells[cell.id].state = model.states[1]));
-		// log.debug(people[socket.id].map);
-		// log.debug(people[socket.id].ships.map(ship => ship.name));
-		people[socket.id].status = "ready";
+		let clientShips = JSON.parse(dataShips);
+		log.debug(clientShips);
+		let ships = [];
+		clientShips.forEach(function(clientShip) {
+			let cells = [];
+			clientShip.cells.forEach(function(id) {
+				let cell = model.Cell(id);
+				cell.state = model.states[1];
+				cell.shipId = clientShip.id;
+				cells.push(cell);
+				player.map.cells[id] = cell;
+			});
+			ships.push(model.Ship(clientShip.id, clientShip.name, cells));
+		});
+		player.ships = ships;
+		player.status = "ready";
+		log.debug(player.toString());
 
-		let gameId = people[socket.id].gameId;
+		let gameId = player.gameId;
 		let statusOne = people[games[gameId].iDplayerOne].status;
 		let statusTwo = people[games[gameId].iDplayerTwo].status;
 		if (statusOne === "ready" && statusTwo === "ready") {
@@ -135,29 +147,35 @@ io.on("connection", function(socket) {
 	});
 
 	socket.on("play", function(cellId) {
+		let continuousGame = true;
 		let opponentId = people[socket.id].opponentId;
-		let firedCell = people[opponentId].map.cells[cellId];
-		// console.log(firedCell.toString());
+		let opponent = people[opponentId];
+		let firedCell = opponent.map.cells[cellId];
+		log.debug(firedCell.toString());
+		let color = undefined;
 		if (firedCell.state === model.states[1]) {
 			firedCell.state = model.states[2];
+			color = "red";
+			if (opponent.ships[firedCell.shipId].isDestroyed()) {
+				log.debug("Ship destroyed ! " + firedCell.shipId);
+				if (opponent.isLost()) {
+					log.debug("player " + opponent.name + " has lost");
+					io.to(opponent.gameId).emit("endGame");
+					continuousGame = false;
+				}
+			}
 		}
 		else {
 			firedCell.state = model.states[3];
+			color = "green";
 		}
-		console.log(people[opponentId].map.cells[cellId]);
+		log.debug(firedCell);
 
-		let color = function() {
-			if (firedCell.state === model.states[2]) {
-				return "red";
-			}
-			if (firedCell.state === model.states[3]) {
-				return "green";
-			}
-		}();
-
-		let response = {cellId: firedCell.id, cellColor: color};
-		socket.emit("response", response);
-		io.to(opponentId).emit("play", response);
+		if (continuousGame) {
+			let response = {cellId: firedCell.id, cellColor: color};
+			socket.emit("response", response);
+			io.to(opponentId).emit("play", response);
+		}
 	});
 
 	socket.on("viewGame", function(id) {
