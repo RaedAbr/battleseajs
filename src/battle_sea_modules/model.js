@@ -9,21 +9,30 @@ function Cell(id) {
 	let c = {
 		id: id,
 		state: states[0],
+		shipId: undefined,
 		setState: function(s) { this.state = s; return c; },
 		toString: function() {
-			return "(Cell : {id: " + this.id + ", state: " + this.state + "})";
+			return "(Cell : {id: " + this.id + ", state: " + this.state + ", shipId: " + this.shipId + "})\n";
 		}
 	};
 	return c;
 }
 
 // Represent a ship on map
-function Ship(name, cells) {
+function Ship(id, name, cells) {
 	return {
+		id: id,
 		name: name,
 		cells: cells,
+		status: "living",
+		destroyedCells: 0,
+		isDestroyed: function() {
+			this.destroyedCells++;
+			return this.destroyedCells >= this.cells.length;
+		},
 		toString: function() {
-			return "(Ship : {name: " + this.name + ", cells: " + this.cells.toString() + "})";
+			return "(Ship : {id: " + this.id + ", name: " + this.name + ", cells: " + this.cells.toString() + 
+			", status: " + this.status + ", destroyedCells: " + this.destroyedCells + "})\n";
 		}
 	};
 }
@@ -49,12 +58,20 @@ function People(id, name, ships) {
 	return {
 		id: id,
 		name: name,
+		gameId: undefined,
 		map: Map(rowsColumns, rowsColumns),
 		ships: ships,
 		opponentId: undefined,
+		status: undefined,
+		destroyedShips: 0,
+		isLost: function() {
+			this.destroyedShips++;
+			return this.destroyedShips >= this.ships.length;
+		},
 		toString: function() {
-			return "(People : {id: " + this.id + ", name: " + this.name + ", map: " + 
-			this.map.toString() + ", ships: " + this.ships + "})";
+			return "(People : {id: " + this.id + ", name: " + this.name + ", gameId: " + 
+			this.gameId + ", map: " + this.map.toString() + ", ships: " + this.ships + 
+			", opponentId: " + this.opponentId + ", status: " + this.status + "})";
 		}
 	};
 }
@@ -80,7 +97,7 @@ function Game(id, iDplayerOne, free) {
 exports.states = states;
 exports.rowsColumns = rowsColumns;
 exports.Cell = (id) => Cell(id);
-exports.Ship = (name, cells) => Ship(name, cells);
+exports.Ship = (id, name, cells) => Ship(id, name, cells);
 exports.Map = (rows, columns) => Map(rows, columns);
 exports.People = (id, name, ships) => People(id, name, ships);
 exports.Game = (id, iDplayerOne, free) => Game(id, iDplayerOne, free);
