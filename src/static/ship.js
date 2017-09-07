@@ -1,6 +1,6 @@
 function drawShips(data, svg) {
 	let enableContextMenuEvent = true;
-	let filledCells  = [];
+	let takenCells  = [];
 	drag = d3.behavior.drag()
 		.on("drag", function(d) {
 			d.x += d3.event.dx;
@@ -9,22 +9,23 @@ function drawShips(data, svg) {
 				d.state =  "in";
 			}
 			defineLimits(d, d3.select(this));
-			d3.select(this)
-				.attr("x", d.x).attr("y", d.y);
 			console.log('dragging');
 		})
 		.on('dragstart', function(d){
+			console.log(takenCells);
 			removeOldCells(d);
+			console.log(takenCells);
 
 			d.cells = [];
 
-			startBlink(d3.select(this));
+			// startBlink(d3.select(this));
 
 			console.log('drag start');
 		})
 		.on('dragend', function(d, i){
 			if (d.state == "in")
 				magnet(d, d3.select(this));
+				updateShipCells(d, d3.select(this));
 		//	if (collision(d, d3.select(this))) {
 		//		d3.select(this)
 		//			.attr("x", initialShipData[i].x)
@@ -38,17 +39,9 @@ function drawShips(data, svg) {
 				// d.height = initialShipData[i].height;
 				// d.dir = initialShipData[i].dir;
 		//	}
+			console.log(takenCells);
 			console.log('drag end');
 		});
-
-	let removeOldCells = function(ship) {
-		oldCells = clone(ship.cells);
-		oldCells.forEach(cell => filledCells.forEach(function(d, i) {
-			if (cell == d) {
-				filledCells.splice(i, 1);
-			}
-		}));
-	};
 
 	let startBlink = function(shipView) {
 		shipView.transition()
@@ -61,6 +54,13 @@ function drawShips(data, svg) {
 				.duration(300)
 				.style("opacity", 1)
 				.each("end", repeat);
+			});
+	};
+
+	let stopBlink = function(shipView) {
+		shipView.transition()
+			.style("opacity", function() {
+				return 1;
 			});
 	};
 
@@ -96,27 +96,25 @@ function drawShips(data, svg) {
 		.on('click', function() {
 			console.log('clicked');
 		})
-		.on("contextmenu", changeDirection);
+		.on("contextmenu", function(d) { changeDirection(d, d3.select(this)); });
 
-	function changeDirection(d) {
+	function changeDirection(ship, object) {
 		d3.event.preventDefault();
 		if (enableContextMenuEvent) {
-			if (d.dir == "h") 
-				d.dir = "v";
+			if (ship.dir == "h") 
+				ship.dir = "v";
 			else
-				d.dir = "h";
-			d3.select(this)
-				.attr("xlink:href", function(d){ return d.img[d.dir]; });
-			d.x += d.width / 2 - d.height / 2;
-			d.y -= d.width / 2 - d.height / 2;
-			let aux = d.width;
-			d.width = d.height;
-			d.height = aux;
-			d3.select(this)
-				.attr("width", d.width)
-				.attr("height", d.height);
-			defineLimits(d, d3.select(this));
-			magnet(d, d3.select(this));
+				ship.dir = "h";
+			object.attr("xlink:href", ship.img[ship.dir]);
+			ship.x += ship.width / 2 - ship.height / 2;
+			ship.y -= ship.width / 2 - ship.height / 2;
+			let aux = ship.width;
+			ship.width = ship.height;
+			ship.height = aux;
+			object.attr("width", ship.width).attr("height", ship.height);
+			magnet(ship, object);
+			defineLimits(ship, object);
+			updateShipCells(ship, object);
 		}
 	};
 
@@ -135,43 +133,37 @@ function drawShips(data, svg) {
 				d.y = mapW - d.height;
 			}
 		}
+		updateView(d, object);
 	};
 
 	let magnet = function(d, object) {
 		d.x = Math.round(d.x / z) * z;
 		d.y = Math.round(d.y / z) * z;
-		object.attr("x", d.x).attr("y", d.y);
-
-		// filledCells .push(d.x / z + d.y / z * 10);
-		updateShipCells(d, object);
+		updateView(d, object);
 	};
 
 	let updateShipCells = function(ship, object) {
 		// removing old cells
 		removeOldCells(ship);
 
-		let firstCell = ship.x / z + ship.y / z * 10;
+		let firstShipCell = ship.x / z + ship.y / z * 10;
 		ship.cells = [];
 		if (ship.dir == "h") {
-			d3.range(ship.width / z).map(function(i) {
-				ship.cells.push(firstCell + i);
+			d3.range(Math.floor(ship.width / z)).map(function(i) {
+				ship.cells.push(firstShipCell + i);
 			});
 		}
 		if (ship.dir == "v") {
-			d3.range(ship.height / z).map(function(i) {
-				ship.cells.push(firstCell + i * 10);
+			d3.range(Math.floor(ship.height / z)).map(function(i) {
+				ship.cells.push(firstShipCell + i * 10);
 			});
 		}
 		// adding new cells
 		ship.valid = true;
-		ship.cells.forEach(cell => ship.valid &= (filledCells.indexOf(cell) == -1));
+		ship.cells.forEach(cell => ship.valid &= (takenCells.indexOf(cell) == -1));
 		if (ship.valid) {
-			ship.cells.forEach(cell => filledCells.push(cell));
-
-			object.transition()
-				.style("opacity", function() {
-					return 1;
-				});
+			ship.cells.forEach(cell => takenCells.push(cell));
+			stopBlink(object);
 		} else {
 			ship.cells = [];
 			startBlink(object);
@@ -180,11 +172,19 @@ function drawShips(data, svg) {
 		getReady();
 	};
 
+	let removeOldCells = function(ship) {
+		let oldCells = clone(ship.cells);
+		oldCells.forEach(cell => takenCells.forEach(function(d, i) {
+			if (cell === d) {
+				takenCells.splice(i, 1);
+			}
+		}));
+	};
+
 	let getReady = function () {
 		let unvalidShips = shipData.filter(e => !e.valid || e.valid == undefined);
 		if (unvalidShips.length == 0) {
-			d3.select("#buttonTd")
-				.selectAll("button").remove();
+			d3.selectAll("#readyButton").remove();
 			d3.select("#buttonTd")
 				.append("button")
 				.attr("id", "readyButton")
@@ -194,7 +194,7 @@ function drawShips(data, svg) {
 					drag.on("dragend", null);
 					svg.selectAll('.ship').selectAll('image').on("contextmenu", null);
 					sendData();
-					d3.select(this).remove();
+					d3.select("#buttonTd").selectAll("button").remove();
 					enableContextMenuEvent = false;
 				})
 				.html("Ready");
@@ -210,23 +210,23 @@ function drawShips(data, svg) {
 			.html("Random")
 			.attr("id", "randomButton")
 			.on("click", function() {
+				takenCells  = [];
 				randomShipPositions(data);
+				console.log(takenCells);
 			});
 	})();
 
 	function randomShipPositions(data) {
 		data.forEach(function(ship) {
-				console.log(ship);
 			let rn = getRndInteger(0, 100);
 			if (rn < 50) {
-				ship.dir = "h";
-			} else {
-				ship.dir = "v";
+				changeDirection(ship, d3.select("#ship" + ship.id));
 			}
 			ship.x = getRndInteger(0, mapW - ship.width);
 			ship.y = getRndInteger(0, mapW - ship.height);
-			
 			magnet(ship, d3.select("#ship" + ship.id));
+			defineLimits(ship, d3.select("#ship" + ship.id));
+			updateShipCells(ship, d3.select("#ship" + ship.id));
 		});
 	}
 }
@@ -240,4 +240,8 @@ function drawShips(data, svg) {
 */
 function getRndInteger(min, max) {
 	return Math.floor(Math.random() * (max - min + 1) ) + min;
+}
+
+function updateView(ship, shipView) {
+	shipView.attr("x", ship.x).attr("y", ship.y);
 }
