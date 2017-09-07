@@ -44,7 +44,6 @@ let games = {};
 let gameIdOnHold = undefined;
 
 io.on("connection", function(socket) {
-	// ------------------------------------ Socket's events ------------------------------------
 	socket.on(sockets.joinServerEvent, function(name) {
 		people[socket.id] = model.People(socket.id, name, undefined);
 		sockets.peopleList(io, people);
@@ -74,7 +73,6 @@ io.on("connection", function(socket) {
 
 	socket.on(sockets.readyEvent, function(dataShips) {
 		let player = people[socket.id];
-		log.debug("in ready");
 		log.debug("id player : " + player.id);
 		log.debug("gameId : " + player.gameId);
 
@@ -97,9 +95,7 @@ io.on("connection", function(socket) {
 		log.debug(player.toString());
 
 		let game = games[player.gameId];
-		let statusOne = people[game.iDplayerOne].status;
-		let statusTwo = people[game.iDplayerTwo].status;
-		if (statusOne === "ready" && statusTwo === "ready") {
+		if (people[game.iDplayerOne].status === "ready" && people[game.iDplayerTwo].status === "ready") {
 			game.status = "play";
 			io.to(game.iDplayerOne).emit(sockets.playEvent);
 		}
