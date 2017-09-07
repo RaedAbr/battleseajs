@@ -12,8 +12,15 @@ socket.on("games", function(games) {
 	$("#games").text("Games : " + games);
 });
 
+function removeButtons() {
+	$("#createGame").remove();
+	$("#gameId").remove();
+	$("#joinGame").remove();
+}
+
 $("#createGame").on("click", function() {
 	socket.emit("createGame");
+	removeButtons();
 });
 socket.on("createGame", function(id) {
 	$("#gameCreated").text("Game id : " + id);
@@ -29,6 +36,7 @@ $("#joinGame").on("click", function() {
 		console.log("joinGameId");
 		socket.emit("joinGameId", gameId);
 	}
+	removeButtons();
 });
 socket.on("joined", function(ids) {
 	$("#joined").text("Joined on " + ids.gameId);
