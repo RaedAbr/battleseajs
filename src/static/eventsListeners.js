@@ -5,24 +5,27 @@ function loadListeners(cellsData) {
 	});
 
 	socket.on("fireEvent", function(event) {
+		console.log(event.cellState);
 		if (playerId === event.player.id) {
 			d3.select("#g1" + event.cellId)
 				.attr("fill", function() {
-					return event.state === "missed" ? "green" : "red";
-				});
+					return event.cellState === "missed" ? "green" : "red";
+				})
+				.style("opacity", 1);
 		} else {
 			d3.select("#g2" + event.cellId)
 				.attr("fill", function() {
-					return event.state === "missed" ? "green" : "red";
-				});
+					return event.cellState === "missed" ? "green" : "red";
+				})
+				.style("opacity", 1);
 		}
-		var currentdate = new Date();
-		var dateTime = currentdate.getHours() + ":"  
-			+ currentdate.getMinutes() + ":" 
-			+ currentdate.getSeconds();
-		d3.select("#history")
-			.append("p")
-			.html(dateTime + " =>" + event.player.name + " " + event.state);
+		// var currentdate = new Date();
+		// var dateTime = currentdate.getHours() + ":"  
+		// 	+ currentdate.getMinutes() + ":" 
+		// 	+ currentdate.getSeconds();
+		// d3.select("#history")
+		// 	.append("p")
+		// 	.html(dateTime + " =>" + event.player.name + " " + event.state);
 		myTurn = false;
 	});
 

@@ -43,11 +43,10 @@ function handleMouseOut(d) {
 }
 
 function handleMouseClick(d) {
-	console.log(d);
 	if (myTurn) {
-		// d3.select(this).style("fill", "red");
 		if (d.state === "free") {
 			socket.emit("play", d.id);
+			d.state = "touched";
 			console.log("from client " + d.id);
 		}
 	}
