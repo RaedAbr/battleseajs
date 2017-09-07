@@ -96,48 +96,51 @@ io.on("connection", function(socket) {
 		player.status = "ready";
 		log.debug(player.toString());
 
-		let gameId = player.gameId;
-		let statusOne = people[games[gameId].iDplayerOne].status;
-		let statusTwo = people[games[gameId].iDplayerTwo].status;
+		let game = games[player.gameId];
+		let statusOne = people[game.iDplayerOne].status;
+		let statusTwo = people[game.iDplayerTwo].status;
 		if (statusOne === "ready" && statusTwo === "ready") {
-			games[gameId].status = "play";
-			io.to(games[gameId].iDplayerOne).emit(sockets.playEvent);
+			game.status = "play";
+			io.to(game.iDplayerOne).emit(sockets.playEvent);
 		}
 	});
 
 	socket.on(sockets.playEvent, function(cellId) {
 		let continuousGame = true;
-		let opponentId = people[socket.id].opponentId;
-		let opponent = people[opponentId];
+		let player = people[socket.id];
+		let opponent = people[player.opponentId];
+		let gameId = player.gameId;
 		let firedCell = opponent.map.cells[cellId];
-		log.debug(firedCell.toString());
+		let firedShip = opponent.ships[firedCell.shipId];
+
 		if (firedCell.state === model.states[1]) {
 			firedCell.state = model.states[2];
-			opponent.ships[firedCell.shipId].destroyedCells++;
-
-			if (opponent.ships[firedCell.shipId].isDestroyed()) {
-				io.to(opponent.gameId).emit(sockets.shipDestroyedEvent, {ship: opponent.ships[firedCell.shipId], 
-					player: {id: people[socket.id].id, name: people[socket.id].name}});
-				log.debug("Ship destroyed ! " + firedCell.shipId + ", " + opponent.ships[firedCell.shipId]);
-				opponent.destroyedShips++;
-
-				if (opponent.hasLost()) {
-					log.debug("player " + opponent.name + " has lost");
-					io.to(opponent.gameId).emit(sockets.endGameEvent, {playerNameWin: people[socket.id].name, 
-						playerNameLoose: opponent.name});
-					continuousGame = false;
-				}
-			}
+			firedShip.destroyedCells++;
 		}
 		else {
 			firedCell.state = model.states[3];
 		}
-		log.debug(firedCell);
+
+		let playerIdName = {id: player.id, name: player.name};
+		log.debug(firedCell.toString());
+		io.to(gameId).emit(sockets.fireEvent, {cellId: firedCell.id, cellState: firedCell.state, player: playerIdName});
+
+		if (firedCell.state === model.states[2]) {
+			if (firedShip.isDestroyed()) {
+				io.to(gameId).emit(sockets.shipDestroyedEvent, {ship: firedShip, player: playerIdName});
+				log.debug("Ship destroyed ! " + firedShip.toString());
+				opponent.destroyedShips++;
+
+				if (opponent.hasLost()) {
+					log.debug("player " + opponent.name + " has lost");
+					io.to(gameId).emit(sockets.endGameEvent, {playerNameWin: player.name, playerNameLoose: opponent.name});
+					continuousGame = false;
+				}
+			}
+		}
 
 		if (continuousGame) {
-			io.to(opponent.gameId).emit(sockets.fireEvent, {cellId: firedCell.id, cellState: firedCell.state, 
-				player: {id: people[socket.id].id, name: people[socket.id].name}});
-			io.to(opponentId).emit(sockets.playEvent);
+			io.to(opponent.id).emit(sockets.playEvent);
 		}
 	});
 
