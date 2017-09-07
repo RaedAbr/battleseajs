@@ -1,11 +1,10 @@
-function loadListeners(cellsData) {
+function loadListeners() {
 	// wait for player turn to play
 	socket.on("play", function() {
 		myTurn = true;
 	});
 
 	socket.on("fireEvent", function(event) {
-		console.log(event.cellState);
 		if (playerId === event.player.id) {
 			d3.select("#g1" + event.cellId)
 				.attr("fill", function() {
@@ -30,7 +29,23 @@ function loadListeners(cellsData) {
 	});
 
 	socket.on("shipDestroyed", function(event) {
+		if (playerId === event.player.id) {
+			let x = event.ship.cells[0].id % 10 * z;
+			let y = Math.floor(event.ship.cells[0].id / 10) * z;
+			let width = event.ship.dir === "h" ? event.ship.cells.length * z : z;
+			let height = event.ship.dir === "h" ? z : event.ship.cells.length * z;
+			let imageSrc = event.ship.dir === "h" ? event.ship.name + "H.png" : event.ship.name + "V.png";
+			d3.select("#map1").select("svg")
+				.append("image")
+				.attr('x', x)
+				.attr('y', y)
+				.attr('width', width) 
+				.attr('height', height)
+				.attr("xlink:href", "static/img/" + imageSrc)
+				.style("opacity", .7);
+		} else {
 
+		}
 	});
 
 	// wait for server response after cell fire

@@ -27,7 +27,6 @@ function Ship(id, name, cells, dir) {
 		dir: dir,
 		destroyedCells: 0,
 		isDestroyed: function() {
-			this.destroyedCells++;
 			return this.destroyedCells >= this.cells.length;
 		},
 		toString: function() {
