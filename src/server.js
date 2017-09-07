@@ -24,6 +24,10 @@ app.use("/static", express.static(path.join(__dirname, "static")))
 	log.debug("Request model.js");
 	res.sendFile(path.join(__dirname + modulesFolder + "/model.js"));
 })
+.get("/computer", function(req, res) {
+	log.debug("Request computer.html");
+	res.sendFile(path.join(__dirname + viewsFolder + "/computer.html"));
+})
 
 .all("*", function(req, res) {
 	log.error("Requested:", req.url);
@@ -83,23 +87,29 @@ io.on("connection", function(socket) {
 
 	function joinGame(id) {
 		if (games[id].status !== "joined") {
-			games[id].iDplayerTwo = socket.id;
-			games[id].status = "joined";
+			if (socket.id !== games[id].iDplayerOne) {
+				games[id].iDplayerTwo = socket.id;
+				games[id].status = "joined";
 
-			let opponentId = games[id].iDplayerOne;
-			people[opponentId].opponentId = socket.id;
-			people[socket.id].opponentId = opponentId;
+				let opponentId = games[id].iDplayerOne;
+				people[opponentId].opponentId = socket.id;
+				people[socket.id].opponentId = opponentId;
 
-			socket.join(id);
-			people[socket.id].gameId = id;
-			// io.to(id).emit(joined, id); // emit to all socket in the room "id"
-			socket.emit(joined, {gameId: id, playerId: socket.id});
-			io.to(opponentId).emit(joined, {gameId: id, playerId: opponentId});
-			log.debug(people[socket.id].name + " join game :");
-			log.debug(games[id]);
+				socket.join(id);
+				people[socket.id].gameId = id;
+				// io.to(id).emit(joined, id); // emit to all socket in the room "id"
+				socket.emit(joined, {gameId: id, playerId: socket.id});
+				io.to(opponentId).emit(joined, {gameId: id, playerId: opponentId});
+				log.debug(people[socket.id].name + " join game :");
+				log.debug(games[id]);
+			}
+			else {
+				gameIdOnHold = id;
+			}
 		}
 		else {
 			log.debug("in joinGame, game full");
+			gameIdOnHold = undefined;
 		}
 	}
 
@@ -107,7 +117,7 @@ io.on("connection", function(socket) {
 	socket.on(joinServer, function(name) {
 		people[socket.id] = model.People(socket.id, name, undefined);
 		peopleList();
-		log.debug("A new person connected : " + people[socket.id].name);
+		log.debug("A new person connected : " + people[socket.id].name + ", id: " + socket.id);
 	});
 
 	socket.on(createGame, function() {
@@ -123,7 +133,6 @@ io.on("connection", function(socket) {
 		else {
 			log.debug("in else joinGame");
 			joinGame(gameIdOnHold);
-			gameIdOnHold = undefined;
 		}
 	});
 
