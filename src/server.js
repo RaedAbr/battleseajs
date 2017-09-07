@@ -1,15 +1,15 @@
+"use strict";
+
 const express = require("express");
 const app = express();
 const path = require("path");
 const Log = require("log");
 const log = new Log("debug");
 const http = require("http").Server(app);
-const io = require("socket.io")(http);
-const uuidv4 = require('uuid/v4');
 
-const model = require("./battle_sea_modules/model.js");
 const viewsFolder = "/views";
 const modulesFolder = "/battle_sea_modules";
+const model = require("." + modulesFolder + "/model.js");
 
 http.listen(8080);
 
@@ -36,111 +36,43 @@ app.use("/static", express.static(path.join(__dirname, "static")))
 
 
 // ------------------------------ sockets ------------------------------
+const io = require("socket.io")(http);
+const sockets = require("." + modulesFolder + "/socketFunctions.js");
+
 let people = {};
 let games = {};
 let gameIdOnHold = undefined;
 
-// ------------------------------ event's names ------------------------------
-const joinServer = "joinServer";
-const createGame = "createGame";
-const join = "joinGame";
-const joinGameId = "joinGameId";
-const joined = "joined";
-const ready = "ready";
-const play = "play";
-const fireEvent = "fireEvent";
-const shipDestroyed = "shipDestroyed";
-const endGame = "endGame";
-
-const peopleList = "people";
-const listGames = "games";
-const viewGame = "viewGame";
-const listViewersInRoom = "listViewersInRoom";
-
 io.on("connection", function(socket) {
-	// ------------------------------------ Socket's functions ------------------------------------
-	function peopleList() {
-		io.emit(peopleList, Object.keys(people).map(key => people[key].name)); // emit to all socket in all rooms
-	}
-
-	function listGames() {
-		io.emit(listGames, Object.keys(games).map(key => "[" + games[key].id + ", " + 
-			people[games[key].iDplayerOne].name + "]"));
-	}
-
-	function createGame(free) {
-		let gameId = uuidv4();
-		games[gameId] = model.Game(gameId, socket.id, free);
-		socket.join(gameId);
-		people[socket.id].gameId = gameId;
-		if (free) {
-			gameIdOnHold = gameId;
-		}
-		else {
-			socket.emit(createGame, gameId);
-		}
-		// io.emit("games", names);
-		listGames();
-		log.debug("A new game is created : ");
-		log.debug(games[gameId]);
-	}
-
-	function joinGame(id) {
-		if (games[id].status !== "joined") {
-			if (socket.id !== games[id].iDplayerOne) {
-				games[id].iDplayerTwo = socket.id;
-				games[id].status = "joined";
-
-				let opponentId = games[id].iDplayerOne;
-				people[opponentId].opponentId = socket.id;
-				people[socket.id].opponentId = opponentId;
-
-				socket.join(id);
-				people[socket.id].gameId = id;
-				// io.to(id).emit(joined, id); // emit to all socket in the room "id"
-				socket.emit(joined, {gameId: id, playerId: socket.id});
-				io.to(opponentId).emit(joined, {gameId: id, playerId: opponentId});
-				log.debug(people[socket.id].name + " join game :");
-				log.debug(games[id]);
-			}
-			else {
-				gameIdOnHold = id;
-			}
-		}
-		else {
-			log.debug("in joinGame, game full");
-			gameIdOnHold = undefined;
-		}
-	}
-
 	// ------------------------------------ Socket's events ------------------------------------
-	socket.on(joinServer, function(name) {
+	socket.on(sockets.joinServerEvent, function(name) {
 		people[socket.id] = model.People(socket.id, name, undefined);
-		peopleList();
+		sockets.peopleList(io, people);
 		log.debug("A new person connected : " + people[socket.id].name + ", id: " + socket.id);
 	});
 
-	socket.on(createGame, function() {
+	socket.on(sockets.createGameEvent, function() {
 		log.debug("in createGame");
-		createGame(false);
+		sockets.createGame(io, socket, people, games, false);
 	});
 
-	socket.on(join, function() {
+	socket.on(sockets.joinGameEvent, function() {
 		if (gameIdOnHold === undefined) {
 			log.debug("in if joinGame");
-			createGame(true);
+			gameIdOnHold = sockets.createGame(io, socket, people, games, true);
 		}
 		else {
 			log.debug("in else joinGame");
-			joinGame(gameIdOnHold);
+			log.debug(gameIdOnHold);
+			gameIdOnHold = sockets.joinGame(io, socket, gameIdOnHold, people, games);
 		}
 	});
 
-	socket.on(joinGameId, function(id) {
-		joinGame(id);
+	socket.on(sockets.joinGameIdEvent, function(id) {
+		sockets.joinGame(io, socket, id, people, games);
 	});
 
-	socket.on(ready, function(dataShips) {
+	socket.on(sockets.readyEvent, function(dataShips) {
 		let player = people[socket.id];
 		log.debug("in ready");
 		log.debug("id player : " + player.id);
@@ -169,11 +101,11 @@ io.on("connection", function(socket) {
 		let statusTwo = people[games[gameId].iDplayerTwo].status;
 		if (statusOne === "ready" && statusTwo === "ready") {
 			games[gameId].status = "play";
-			io.to(games[gameId].iDplayerOne).emit(play);
+			io.to(games[gameId].iDplayerOne).emit(sockets.playEvent);
 		}
 	});
 
-	socket.on(play, function(cellId) {
+	socket.on(sockets.playEvent, function(cellId) {
 		let continuousGame = true;
 		let opponentId = people[socket.id].opponentId;
 		let opponent = people[opponentId];
@@ -184,14 +116,14 @@ io.on("connection", function(socket) {
 			opponent.ships[firedCell.shipId].destroyedCells++;
 
 			if (opponent.ships[firedCell.shipId].isDestroyed()) {
-				io.to(opponent.gameId).emit(shipDestroyed, {ship: opponent.ships[firedCell.shipId], 
+				io.to(opponent.gameId).emit(sockets.shipDestroyedEvent, {ship: opponent.ships[firedCell.shipId], 
 					player: {id: people[socket.id].id, name: people[socket.id].name}});
 				log.debug("Ship destroyed ! " + firedCell.shipId + ", " + opponent.ships[firedCell.shipId]);
 				opponent.destroyedShips++;
 
 				if (opponent.hasLost()) {
 					log.debug("player " + opponent.name + " has lost");
-					io.to(opponent.gameId).emit(endGame, {playerNameWin: people[socket.id].name, 
+					io.to(opponent.gameId).emit(sockets.endGameEvent, {playerNameWin: people[socket.id].name, 
 						playerNameLoose: opponent.name});
 					continuousGame = false;
 				}
@@ -203,18 +135,18 @@ io.on("connection", function(socket) {
 		log.debug(firedCell);
 
 		if (continuousGame) {
-			io.to(opponent.gameId).emit(fireEvent, {cellId: firedCell.id, cellState: firedCell.state, 
+			io.to(opponent.gameId).emit(sockets.fireEvent, {cellId: firedCell.id, cellState: firedCell.state, 
 				player: {id: people[socket.id].id, name: people[socket.id].name}});
-			io.to(opponentId).emit(play);
+			io.to(opponentId).emit(sockets.playEvent);
 		}
 	});
 
-	socket.on(viewGame, function(id) {
+	socket.on(sockets.viewGameEvent, function(id) {
 		games[id].viewers.push(id);
 		socket.join(id);
 	});
 
-	socket.on(listViewersInRoom, function(id) {
+	socket.on(sockets.listViewersInRoomEvent, function(id) {
 		// let names = 
 		// socket.emit(JSON.stringify(people));
 	});
