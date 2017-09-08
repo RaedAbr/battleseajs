@@ -16,12 +16,13 @@ $("#createGame").on("click", function() {
 	socket.emit("createGame");
 	removeButtons();
 });
+
 socket.on("createGame", function(id) {
 	$("#gameCreated").text("Game id : " + id);
 });
 
 $("#joinGame").on("click", function() {
-	let gameId = $.trim($('#gameId').val());
+	let gameId = $.trim($('#gameIdInput').val());
 	if(gameId === "") {
 		console.log("joinGame");
 		socket.emit("joinGame");
