@@ -8,16 +8,16 @@
 	<link rel="stylesheet" type="text/css" href="static/style.css">
 </head>
 <body>
-	<div class="container text-center">
+	<div id="mainContainer" class="border border-secondary container text-center rounded-top">
 		<h1>Battle sea JS</h1>
 		<h2>Hello <span id="playerName"></span></h2>
-		<div class="row">
-			<div class="col">
+		<div class="row justify-content-md-center">
+			<div class="col-md-auto">
 				<div class="input-group">
 					<button id="createGame" class="btn btn-outline-danger btn-sm btn-block">Create Game</button>
 				</div><br>
 				<div class="input-group" id="gameId">
-					<span class="input-group-addon" id="sizing-addon1">@</span>
+					<span class="input-group-addon" id="sizing-addon1">id</span>
 					<input type="text" id="gameIdInput" name="gameId" class="form-control" placeholder="Enter id received" aria-label="Enter id received">
 				</div><br>
 				<div class="input-group">
@@ -32,7 +32,9 @@
 
 
 		<div id="gameContent" style="opacity: 0">
-			<p id="play" class="alert alert-warning" role="alert">State : Place your ships, then click "Ready"!</p>
+			<div class="row justify-content-md-center">
+				<div id="play" class="alert alert-warning col-md-auto" role="alert">State : Place your ships, then click "Ready"!</div>
+			</div>
 			<table class="table-sm" style="display: inline-block;">
 				<thead class="thead-default">
 					<tr>

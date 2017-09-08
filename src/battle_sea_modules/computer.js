@@ -167,7 +167,7 @@ function randomFire(rowsCols) {
 }
 
 function computer(instance) {
-	instance.emit(sockets.joinServerEvent, "It's me, Computer !");
+	instance.emit(sockets.joinServerEvent, "Computer");
 	instance.emit(sockets.joinGameEvent);
 	log.debug("Computer 'created' game emit");
 	
