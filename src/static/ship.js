@@ -75,7 +75,7 @@ function drawShips(svg) {
 			let aux = ship.width;
 			ship.width = ship.height;
 			ship.height = aux;
-			object.attr("width", ship.width).attr("height", ship.height);
+			// object.attr("width", ship.width).attr("height", ship.height);
 		}
 	};
 
@@ -178,15 +178,50 @@ function drawShips(svg) {
 	})();
 
 	function randomShipPositions() {
+		let usedCells = [];
 		shipsData.forEach(function(ship) {
-			randomDirection(ship, d3.select("#ship" + ship.id));
-			ship.x = getRndInteger(0, mapW - ship.width);
-			ship.y = getRndInteger(0, mapW - ship.height);
-			magnet(ship, d3.select("#ship" + ship.id));
-			defineLimits(ship, d3.select("#ship" + ship.id));
-			console.log(ship);
-			updateShipCells(ship, d3.select("#ship" + ship.id));
+			let validCells = false;
+			while (!validCells) {
+				randomDirection(ship, d3.select("#ship" + ship.id));
+				ship.x = getRndInteger(0, mapW - ship.width);
+				ship.y = getRndInteger(0, mapW - ship.height);
+				ship.x = Math.round(ship.x / z) * z;
+				ship.y = Math.round(ship.y / z) * z;
+				let firstCell = Math.floor(ship.x / z) + Math.floor(ship.y / z) * 10;
+				let cells = [];
+				if (ship.dir === "h") {
+					d3.range(ship.size).forEach(i => cells.push(firstCell + i));
+				} else {
+					d3.range(ship.size).forEach(i => cells.push(firstCell + i * 10));
+				}
+				let i = 0;
+				while (i < ship.size) {
+					if (usedCells.indexOf(cells[i]) == -1) {
+						usedCells.push(cells[i]);
+					} else {
+						break;
+					}
+					i += 1;
+				}
+				if (i === ship.size) {
+					validCells = true;
+					ship.cells = cells;
+					cells.forEach(cell => takenCells.push(cell));
+				}
+			}
+			ship.valid = true;
+			d3.select("#ship" + ship.id)
+				.attr("x", ship.x)
+				.attr("y", ship.y)
+				.attr("width", ship.width)
+				.attr("height", ship.height);
+			// magnet(ship, d3.select("#ship" + ship.id));
+			// defineLimits(ship, d3.select("#ship" + ship.id));
+			// console.log(ship);
+			// updateShipCells(ship, d3.select("#ship" + ship.id));
 		});
+		getReady();
+		console.log(takenCells);
 	}
 }
 

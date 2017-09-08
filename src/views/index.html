@@ -8,7 +8,7 @@
 	<link rel="stylesheet" type="text/css" href="static/style.css">
 </head>
 <body>
-	<div class="container text-center">
+	<div id="mainContainer" class="border border-secondary container text-center rounded-top">
 		<h1>Battle sea JS</h1>
 		<h2>Hello <span id="playerName"></span></h2>
 		<div class="row justify-content-md-center">
@@ -32,7 +32,9 @@
 
 
 		<div id="gameContent" style="opacity: 0">
-			<p id="play" class="alert alert-warning" role="alert">State : Place your ships, then click "Ready"!</p>
+			<div class="row justify-content-md-center">
+				<div id="play" class="alert alert-warning col-md-auto" role="alert">State : Place your ships, then click "Ready"!</div>
+			</div>
 			<table class="table-sm" style="display: inline-block;">
 				<thead class="thead-default">
 					<tr>
