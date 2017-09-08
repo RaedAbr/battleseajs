@@ -17,7 +17,7 @@ d3.range(nb * nb)
 		state : "free"
 	}));
 
-let shipData = [
+let shipsData = [
 	{x : 10, y : 310, width : 2 * z, height : z, dir : "h", img : {"h" : "static/img/CruiserH.png", "v" : "static/img/CruiserV.png"}, cells : [], state : "out", valid : undefined, id : 0, name : "Cruiser"},
 	{x : 10, y : 342, width : 3 * z, height : z, dir : "h", img : {"h" : "static/img/Submarine1H.png", "v" : "static/img/Submarine1V.png"}, cells : [], state : "out", valid : undefined, id : 1, name : "Submarine1"},
 	{x : 10, y : 374, width : 3 * z, height : z, dir : "h", img : {"h" : "static/img/Submarine2H.png", "v" : "static/img/Submarine2V.png"}, cells : [], state : "out", valid : undefined, id : 2, name : "Submarine2"},
@@ -38,9 +38,7 @@ function load(gamePlayerId) {
 	/////////////////////////////map2//////////////////////////////////////
 	let svg2 = map("#map2", 2, cellsData);
 
-	let initialShipData = clone(shipData);
-
-	drawShips(shipData, svg2);
+	drawShips(svg2);
 
 	loadListeners();
 }

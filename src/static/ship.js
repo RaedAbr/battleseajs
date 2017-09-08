@@ -1,4 +1,4 @@
-function drawShips(data, svg) {
+function drawShips(svg) {
 	let enableContextMenuEvent = true;
 	let takenCells  = [];
 	drag = d3.behavior.drag()
@@ -12,77 +12,20 @@ function drawShips(data, svg) {
 			console.log('dragging');
 		})
 		.on('dragstart', function(d){
-			console.log(takenCells);
 			removeOldCells(d);
-			console.log(takenCells);
-
 			d.cells = [];
-
-			// startBlink(d3.select(this));
-
 			console.log('drag start');
 		})
 		.on('dragend', function(d, i){
-			if (d.state == "in")
+			if (d.state == "in") {
 				magnet(d, d3.select(this));
 				updateShipCells(d, d3.select(this));
-		//	if (collision(d, d3.select(this))) {
-		//		d3.select(this)
-		//			.attr("x", initialShipData[i].x)
-		//			.attr("y", initialShipData[i].y)
-		//			.attr("width", initialShipData[i].width)
-		//			.attr("height", initialShipData[i].height)
-				// 	.attr("xlink:href", function(d){ return initialShipData[i].img[initialShipData[i].dir]; });
-				// d.x = initialShipData[i].x;
-				// d.y = initialShipData[i].y;
-				// d.width = initialShipData[i].width;
-				// d.height = initialShipData[i].height;
-				// d.dir = initialShipData[i].dir;
-		//	}
-			console.log(takenCells);
+			}
 			console.log('drag end');
 		});
 
-	let startBlink = function(shipView) {
-		shipView.transition()
-			.each("start", function repeat() {
-				d3.select(this)
-				.transition()
-				.duration(300)
-				.style("opacity", 0.3)
-				.transition()
-				.duration(300)
-				.style("opacity", 1)
-				.each("end", repeat);
-			});
-	};
-
-	let stopBlink = function(shipView) {
-		shipView.transition()
-			.style("opacity", function() {
-				return 1;
-			});
-	};
-
-	// let collision = function(d, object) {
-	// 	let result = shipData.filter(x => intersects(d, x));
-	// 	if (result.length != 0)
-	// 		return true;
-	// 	return false;
-	// }
-
-	// function intersects(current, other) {
-	// 	// if (current.dir == "v" && other.dir == "h") {
-	// 		// if (current.x >= other.x && current.x <= other.x + other.width
-	// 		// 	&& current.y <= other.y && current.y + current.height >= other.y) {
-	// 		// 	return other;
-	// 		// }
-	// 	// }
-	// 	return undefined;
-	// }
-
 	svg.selectAll('.ship')
-		.data(data)
+		.data(shipsData)
 		.enter()
 		.append('image')
 		.attr("id", function (d) { return "ship" + d.id; })
@@ -115,6 +58,24 @@ function drawShips(data, svg) {
 			magnet(ship, object);
 			defineLimits(ship, object);
 			updateShipCells(ship, object);
+		}
+	};
+
+	function randomDirection(ship, object) {
+		let rn = getRndInteger(0, 100);
+		let newDir = "h";
+		if (rn < 50) {
+			newDir = "v";
+		}
+		if (newDir !== ship.dir) {
+			ship.dir = newDir;
+			object.attr("xlink:href", ship.img[ship.dir]);
+			ship.x += ship.width / 2 - ship.height / 2;
+			ship.y -= ship.width / 2 - ship.height / 2;
+			let aux = ship.width;
+			ship.width = ship.height;
+			ship.height = aux;
+			object.attr("width", ship.width).attr("height", ship.height);
 		}
 	};
 
@@ -163,10 +124,8 @@ function drawShips(data, svg) {
 		ship.cells.forEach(cell => ship.valid &= (takenCells.indexOf(cell) == -1));
 		if (ship.valid) {
 			ship.cells.forEach(cell => takenCells.push(cell));
-			stopBlink(object);
 		} else {
 			ship.cells = [];
-			startBlink(object);
 		}
 
 		getReady();
@@ -182,12 +141,13 @@ function drawShips(data, svg) {
 	};
 
 	let getReady = function () {
-		let unvalidShips = shipData.filter(e => !e.valid || e.valid == undefined);
+		let unvalidShips = shipsData.filter(e => !e.valid || e.valid == undefined);
 		if (unvalidShips.length == 0) {
 			d3.selectAll("#readyButton").remove();
 			d3.select("#buttonTd")
 				.append("button")
 				.attr("id", "readyButton")
+				.attr("class", "btn btn-primary btn-sm")
 				.on("click", function() {
 					drag.on("drag", null);
 					drag.on("dragstart", null);
@@ -208,24 +168,23 @@ function drawShips(data, svg) {
 		d3.select("#buttonTd")
 			.append("button")
 			.html("Random")
+			.attr("class", "btn btn-secondary btn-sm")
 			.attr("id", "randomButton")
 			.on("click", function() {
 				takenCells  = [];
-				randomShipPositions(data);
+				randomShipPositions();
 				console.log(takenCells);
 			});
 	})();
 
-	function randomShipPositions(data) {
-		data.forEach(function(ship) {
-			let rn = getRndInteger(0, 100);
-			if (rn < 50) {
-				changeDirection(ship, d3.select("#ship" + ship.id));
-			}
+	function randomShipPositions() {
+		shipsData.forEach(function(ship) {
+			randomDirection(ship, d3.select("#ship" + ship.id));
 			ship.x = getRndInteger(0, mapW - ship.width);
 			ship.y = getRndInteger(0, mapW - ship.height);
 			magnet(ship, d3.select("#ship" + ship.id));
 			defineLimits(ship, d3.select("#ship" + ship.id));
+			console.log(ship);
 			updateShipCells(ship, d3.select("#ship" + ship.id));
 		});
 	}

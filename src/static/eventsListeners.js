@@ -4,6 +4,7 @@ function loadListeners() {
 		myTurn = true;
 	});
 
+
 	socket.on("fireEvent", function(event) {
 		if (playerId === event.player.id) {
 			d3.select("#g1" + event.cellId)
@@ -18,14 +19,20 @@ function loadListeners() {
 				})
 				.style("opacity", 1);
 		}
-		// var currentdate = new Date();
-		// var dateTime = currentdate.getHours() + ":"  
-		// 	+ currentdate.getMinutes() + ":" 
-		// 	+ currentdate.getSeconds();
-		// d3.select("#history")
-		// 	.append("p")
-		// 	.html(dateTime + " =>" + event.player.name + " " + event.state);
+		var currentdate = new Date();
+		var dateTime = currentdate.getHours() + ":"  
+			+ currentdate.getMinutes() + ":" 
+			+ currentdate.getSeconds();
+		d3.select("#historyRow")
+			.append("tr")
+			.append("td")
+			.html(dateTime + " : " + event.player.name + " => " + event.cellState + " cell")
+			.attr("class", function() {
+				return event.cellState === "missed" ? "d-block bg-secondary text-white" : "d-block bg-warning text-white";
+			});
 		myTurn = false;
+		var box = document.getElementById('historyDiv');
+			box.scrollTop = box.scrollHeight;
 	});
 
 	socket.on("shipDestroyed", function(event) {
@@ -43,35 +50,29 @@ function loadListeners() {
 				.attr('height', height)
 				.attr("xlink:href", "static/img/" + imageSrc)
 				.style("opacity", .7);
-		} else {
-
 		}
+		var currentdate = new Date();
+		var dateTime = currentdate.getHours() + ":"  
+			+ currentdate.getMinutes() + ":" 
+			+ currentdate.getSeconds();
+		d3.select("#historyRow")
+			.append("tr")
+			.append("td")
+			.html(dateTime + " : \"" + event.player.name + "\" destroy " + event.ship.name)
+			.attr("class", "d-block bg-danger text-white");
+
+		var box = document.getElementById('historyDiv');
+			box.scrollTop = box.scrollHeight;
 	});
 
-	// wait for server response after cell fire
-	// socket.on("response", function(resp) {
-	// 	console.log(resp);
-	// 	d3.select("#g1" + resp.cellId)
-	// 		.attr("fill", resp.cellColor)
-	// 		.style("opacity", "1");
-	// 	cellsData[resp.cellId].state = "taken";
-	// 	myTurn = false;
-	// });
-
-	// socket.on("notify", function(notif) {
-	// 	if (notif.code == 0) {
-	// 		let cellId = notif.message;
-	// 		let color = "green";
-	// 		if (notif.code == 1) 
-	// 			color = "red";
-	// 		d3.select("#g1" + cellId)
-	// 			.attr("fill", color)
-	// 			.style("opacity", "1");
-	// 		cellsData[resp.cellId].state = "taken";
-	// 		// d3.select("#history")
-	// 		myTurn = false;
-	// 	} else if (notif.code == 2) {
-
-	// 	}
-	// });
+	socket.on("endGame", function(event) {
+		let st = event.playerWin.id === playerId ? "You win!" : "You loose!";
+		d3.select("#endGameModalLabel").html(st);
+		st = event.playerWin.id === playerId ? "Player \"" + event.playerLoose.name + "\" loose." : "Player \"" + event.playerWin.name + "\" win."
+		d3.select("#endGameModalBody").html(st);
+		let color = event.playerWin.id === playerId ? "bg-success text-white" : "bg-danger text-white";
+		d3.select(".modal-header").classed(color, true);
+		d3.select("#closeModalButton").classed(color, true);
+		$('#endGamePopUp').modal();
+	});
 }

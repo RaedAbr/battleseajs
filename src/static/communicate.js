@@ -4,13 +4,13 @@ const playerName = prompt("Player name :")
 socket.emit("joinServer", playerName);
 $("#playerName").text(playerName);
 
-socket.on("people", function(people) {
-	$("#people").text("People : " + people);
-});
+// socket.on("people", function(people) {
+// 	$("#people").text("People : " + people);
+// });
 
-socket.on("games", function(games) {
-	$("#games").text("Games : " + games);
-});
+// socket.on("games", function(games) {
+// 	$("#games").text("Games : " + games);
+// });
 
 function removeButtons() {
 	$("#createGame").remove();
@@ -40,11 +40,12 @@ $("#joinGame").on("click", function() {
 });
 socket.on("joined", function(ids) {
 	$("#joined").text("Joined on " + ids.gameId);
+	$("#gameContent").css({"opacity" : "1"});
 	load(ids.playerId);
 });
 
 socket.on("play", function(id) {
-	$("#play").text("Play ! Your turn");
+	$("#play").text("Play ! Your turn...");
 });
 
 socket.on("endGame", function() {
@@ -54,7 +55,7 @@ socket.on("endGame", function() {
 let sendData = function() {
 	console.log("in sendData");
 	let data = [];
-	shipData.forEach(ship => data.push({
+	shipsData.forEach(ship => data.push({
 		id: ship.id,
 		name : ship.name, 
 		cells : ship.cells,

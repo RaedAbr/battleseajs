@@ -129,7 +129,8 @@ io.on("connection", function(socket) {
 
 				if (opponent.hasLost()) {
 					log.debug("player " + opponent.name + " has lost");
-					io.to(gameId).emit(sockets.endGameEvent, {playerNameWin: player.name, playerNameLoose: opponent.name});
+					io.to(gameId).emit(sockets.endGameEvent, {playerWin: {id: player.id, name: player.name}, 
+						playerLoose: {id: opponent.id, name: opponent.name}});
 					continuousGame = false;
 				}
 			}
