@@ -6,17 +6,16 @@ function loadListeners() {
 
 
 	socket.on("fireEvent", function(event) {
+		function cellState() {
+			return event.cellState === "missed" ? "green" : "red";
+		}
 		if (playerId === event.player.id) {
 			d3.select("#g1" + event.cellId)
-				.attr("fill", function() {
-					return event.cellState === "missed" ? "green" : "red";
-				})
+				.attr("fill", cellState())
 				.style("opacity", 1);
 		} else {
 			d3.select("#g2" + event.cellId)
-				.attr("fill", function() {
-					return event.cellState === "missed" ? "green" : "red";
-				})
+				.attr("fill", cellState())
 				.style("opacity", 1);
 		}
 		var currentdate = new Date();

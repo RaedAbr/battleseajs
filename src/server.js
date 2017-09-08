@@ -13,6 +13,11 @@ const model = require("." + modulesFolder + "/model.js");
 
 http.listen(8080);
 
+// ------------------------------ sockets ------------------------------
+const io = require("socket.io")(http);
+const sockets = require("." + modulesFolder + "/socketFunctions.js");
+const computer = require("." + modulesFolder + "/computer.js");
+
 // ------------------------------ routes ------------------------------
 app.use("/static", express.static(path.join(__dirname, "static")))
 
@@ -25,6 +30,8 @@ app.use("/static", express.static(path.join(__dirname, "static")))
 	res.sendFile(path.join(__dirname + modulesFolder + "/model.js"));
 })
 .get("/computer", function(req, res) {
+	let newInstance = require('socket.io-client')('http://localhost:8080');
+	computer.computer(newInstance);
 	log.debug("Request computer.html");
 	res.sendFile(path.join(__dirname + viewsFolder + "/computer.html"));
 })
@@ -34,14 +41,10 @@ app.use("/static", express.static(path.join(__dirname, "static")))
 	res.status(404).send("404 Page not found.");
 });
 
-
-// ------------------------------ sockets ------------------------------
-const io = require("socket.io")(http);
-const sockets = require("." + modulesFolder + "/socketFunctions.js");
-
 let people = {};
 let games = {};
 let gameIdOnHold = undefined;
+let gameIdComputer = undefined;
 
 io.on("connection", function(socket) {
 	socket.on(sockets.joinServerEvent, function(name) {
@@ -54,6 +57,11 @@ io.on("connection", function(socket) {
 		log.debug("in createGame");
 		sockets.createGame(io, socket, people, games, false);
 	});
+
+	// socket.on(sockets.createGameComputerEvent, function() {
+	// 	log.debug("in createGameComputer");
+	// 	gameIdComputer = sockets.createGame(io, socket, people, games, true);
+	// });
 
 	socket.on(sockets.joinGameEvent, function() {
 		if (gameIdOnHold === undefined) {
@@ -68,8 +76,14 @@ io.on("connection", function(socket) {
 	});
 
 	socket.on(sockets.joinGameIdEvent, function(id) {
+		log.debug("in " + sockets.joinGameIdEvent);
 		sockets.joinGame(io, socket, id, people, games);
 	});
+
+	// socket.on(sockets.joinGameComputerEvent, function() {
+	// 	log.debug("in " + sockets.joinGameComputerEvent);
+	// 	gameIdComputer = sockets.joinGame(io, socket, gameIdComputer, people, games);
+	// });
 
 	socket.on(sockets.readyEvent, function(dataShips) {
 		let player = people[socket.id];

@@ -7,8 +7,10 @@ const model = require("./model.js");
 
 const joinServerEvent = "joinServer";
 const createGameEvent = "createGame";
+const createGameComputerEvent = "createGameComputer";
 const joinGameEvent = "joinGame";
 const joinGameIdEvent = "joinGameId";
+const joinGameComputerEvent = "joinGameComputer";
 const joinedEvent = "joined";
 const readyEvent = "ready";
 const playEvent = "play";
@@ -62,7 +64,6 @@ function joinGame(io, socket, id, people, games) {
 
 			socket.join(id);
 			people[socket.id].gameId = id;
-			// io.to(id).emit(joined, id); // emit to all socket in the room "id"
 			socket.emit(joinedEvent, {gameId: id, playerId: socket.id});
 			io.to(opponentId).emit(joinedEvent, {gameId: id, playerId: opponentId});
 			log.debug(people[socket.id].name + " join game :");
@@ -80,8 +81,10 @@ function joinGame(io, socket, id, people, games) {
 
 exports.joinServerEvent = joinServerEvent;
 exports.createGameEvent = createGameEvent;
+exports.createGameComputerEvent = createGameComputerEvent;
 exports.joinGameEvent = joinGameEvent;
 exports.joinGameIdEvent = joinGameIdEvent;
+exports.joinGameComputerEvent = joinGameComputerEvent;
 exports.joinedEvent = joinedEvent;
 exports.readyEvent = readyEvent;
 exports.playEvent = playEvent;
