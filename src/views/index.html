@@ -8,7 +8,7 @@
 	<link rel="stylesheet" type="text/css" href="static/style.css">
 </head>
 <body>
-	<div class="container">
+	<div class="container text-center">
 		<h1>Battle sea JS</h1>
 		<h2>Hello <span id="playerName"></span></h2>
 		<div class="row">
@@ -24,22 +24,16 @@
 					<button id="joinGame" class="btn btn-outline-info btn-sm btn-block">Join Game</button>
 				</div>
 			</div>
-			<div class="col">
-				<p id="people"></p>
-			</div>
-			<div class="col">
-				<p id="games"></p>
-			</div>
 		</div>
 
 		<p id="gameCreated"></p>
 
 		<p id="joined"></p>
 
-		<p id="play"></p>
 
 		<div id="gameContent" style="opacity: 0">
-			<table class="table-sm">
+			<p id="play" class="alert alert-warning" role="alert">State : Place your ships, then click "Ready"!</p>
+			<table class="table-sm" style="display: inline-block;">
 				<thead class="thead-default">
 					<tr>
 						<th class="text-center">Adversary's map</th>

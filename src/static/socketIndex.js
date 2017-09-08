@@ -1,7 +1,6 @@
 "use strict";
 
 const socket = io.connect("http://localhost:8080");
-
 const playerName = prompt("Player name :")
 socket.emit("joinServer", playerName);
 $("#playerName").text(playerName);
@@ -40,9 +39,10 @@ socket.on("joined", function(ids) {
 	load(ids.playerId);
 });
 
-socket.on("play", function(id) {
-	$("#play").text("Play ! Your turn...");
-});
+// socket.on("play", function(id) {
+// 	let st = playerId === id ? "Play! Your turn..." : "Wait ! Adversary's turn...";
+// 	$("#play").text(st);
+// });
 
 socket.on("endGame", function() {
 	socket.close();

@@ -111,7 +111,8 @@ io.on("connection", function(socket) {
 		let game = games[player.gameId];
 		if (people[game.iDplayerOne].status === "ready" && people[game.iDplayerTwo].status === "ready") {
 			game.status = "play";
-			io.to(game.iDplayerOne).emit(sockets.playEvent);
+			io.to(game.iDplayerOne).emit(sockets.playEvent, people[game.iDplayerOne].id);
+			io.to(game.iDplayerTwo).emit("wait");
 		}
 	});
 
@@ -151,7 +152,7 @@ io.on("connection", function(socket) {
 		}
 
 		if (continuousGame) {
-			io.to(opponent.id).emit(sockets.playEvent);
+			io.to(opponent.id).emit(sockets.playEvent, opponent.id);
 		}
 	});
 

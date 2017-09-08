@@ -1,9 +1,15 @@
 function loadListeners() {
 	// wait for player turn to play
-	socket.on("play", function() {
+	socket.on("play", function(id) {
 		myTurn = true;
+		let st = playerId === id ? "State : Play! Your turn..." : "State : Wait ! Adversary's turn...";
+		d3.select("#play").html(st);
 	});
 
+	socket.on("wait", function(id) {
+		let st = "State : Wait ! Adversary's turn...";
+		d3.select("#play").html(st);
+	});
 
 	socket.on("fireEvent", function(event) {
 		function cellState() {
@@ -30,6 +36,8 @@ function loadListeners() {
 				return event.cellState === "missed" ? "d-block bg-secondary text-white" : "d-block bg-warning text-white";
 			});
 		myTurn = false;
+		let st = "State : Wait ! Adversary's turn...";
+		d3.select("#play").html(st);
 		var box = document.getElementById('historyDiv');
 			box.scrollTop = box.scrollHeight;
 	});
