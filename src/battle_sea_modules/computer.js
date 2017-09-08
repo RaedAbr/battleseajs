@@ -56,22 +56,23 @@ function arrayOfCellsDir(rowsCols) {
 	const maxId = rowsCols * rowsCols - 1;
 	for (let ship of modelShips) {
 		let direction = randomDirection();
-		let firstCell = getRandomIntInclusive(0, maxId);
+		let firstCell = 0;
 
 		let mult = 1;
 		if (direction === "v") {
 			mult = rowsCols;
 		}
+		
+		do {
+			firstCell = getRandomIntInclusive(0, maxId);
+		} while ((firstCell + mult * (ship.size - 1)) > maxFrom(firstCell, direction, rowsCols) 
+			|| cellsOnWay(cellsTaken, firstCell, ship.size, mult));
 
 		// log.debug("\n");
 		// log.debug(cellsTaken);
 		// log.debug(ship);
 		// log.debug(direction);
 		// log.debug(firstCell);
-		while ((firstCell + mult * (ship.size - 1)) > maxFrom(firstCell, direction, rowsCols) 
-			|| cellsOnWay(cellsTaken, firstCell, ship.size, mult)) {
-			firstCell = getRandomIntInclusive(0, maxId);
-		}
 
 		let cellsShip = [];
 		let i = firstCell;
@@ -86,10 +87,10 @@ function arrayOfCellsDir(rowsCols) {
 	return cellsDirShips;
 }
 
-for (var i = 0; i < 100; i++) {
-	console.log(arrayOfCellsDir(model.rowsColumns));
-	console.log("\n");
-}
+// for (var i = 0; i < 100; i++) {
+// 	console.log(arrayOfCellsDir(model.rowsColumns));
+// 	console.log("\n");
+// }
 
 function placeShips() {
 	let ships = [];
@@ -101,6 +102,18 @@ function placeShips() {
 	}
 	log.debug(ships);
 	return ships;
+}
+
+let cellsFired = {};
+
+function randomFire(rowsCols) {
+	const maxId = rowsCols * rowsCols - 1;
+	let fireCell = 0;
+	do {
+		fireCell = getRandomIntInclusive(0, maxId)
+	} while(cellsFired[fireCell] !== undefined);
+	cellsFired[fireCell] = "fired";
+	return fireCell;
 }
 
 function computer(instance) {
@@ -116,6 +129,7 @@ function computer(instance) {
 
 	instance.on(sockets.playEvent, function() {
 		log.debug("Computer play");
+		instance.emit(sockets.playEvent, randomFire(model.rowsColumns));
 	});
 
 	instance.on(sockets.fireEvent, function() {
@@ -128,7 +142,8 @@ function computer(instance) {
 
 	instance.on(sockets.endGameEvent, function() {
 		log.debug("Computer endGameEvent");
-	} );
+		instance.close();
+	});
 }
 
 exports.computer = computer;
