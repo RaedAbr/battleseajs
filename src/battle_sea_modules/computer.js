@@ -105,12 +105,62 @@ function placeShips() {
 }
 
 let cellsFired = {};
+let lastFiredCell = undefined;
+
+function convertCoord(coord, rowsCols) {
+	return coord.row * rowsCols + coord.col;
+}
+
+// log.debug(convertCoord({row:0, col:0}, model.rowsColumns));
+// log.debug(convertCoord({row:0, col:9}, model.rowsColumns));
+// log.debug(convertCoord({row:1, col:0}, model.rowsColumns));
+// log.debug(convertCoord({row:1, col:9}, model.rowsColumns));
+// log.debug(convertCoord({row:4, col:4}, model.rowsColumns));
+// log.debug(convertCoord({row:9, col:0}, model.rowsColumns));
+// log.debug(convertCoord({row:9, col:9}, model.rowsColumns));
+
+function neighbourCells(cellId, rowsCols) {
+	let neighboursCoord = [];
+	let min = 0;
+	let max = rowsCols - 1;
+
+	let row = Math.floor(cellId / rowsCols);
+	let col = cellId % rowsCols;
+
+	let i = row - 1;
+	while (i <= row + 1) {
+		let j = col - 1;
+		while (j <= col + 1) {
+			if (i >= min && i <= max && j >= min && j <= max && !(i == row && j == col)) {
+				let coord = {row: i, col: j};
+				// log.debug("\t" + coord.row + ", " + coord.col);
+				neighboursCoord.push(coord);
+			}
+			j++;
+		}
+		i++;
+	}
+	return neighboursCoord.map(coord => convertCoord(coord, rowsCols));
+}
+
+// log.debug(neighbourCells(0, model.rowsColumns));
+// log.debug(neighbourCells(1, model.rowsColumns));
+// log.debug(neighbourCells(9, model.rowsColumns));
+// log.debug(neighbourCells(20, model.rowsColumns));
+// log.debug(neighbourCells(90, model.rowsColumns));
+// log.debug(neighbourCells(99, model.rowsColumns));
+// log.debug(neighbourCells(95, model.rowsColumns));
+// log.debug(neighbourCells(29, model.rowsColumns));
+// log.debug(neighbourCells(44, model.rowsColumns));
 
 function randomFire(rowsCols) {
 	const maxId = rowsCols * rowsCols - 1;
 	let fireCell = 0;
+	// if (lastFiredCell !== undefined) {
+		
+	// }
 	do {
-		fireCell = getRandomIntInclusive(0, maxId)
+		fireCell = getRandomIntInclusive(0, maxId);
 	} while(cellsFired[fireCell] !== undefined);
 	cellsFired[fireCell] = "fired";
 	return fireCell;
@@ -132,8 +182,13 @@ function computer(instance) {
 		instance.emit(sockets.playEvent, randomFire(model.rowsColumns));
 	});
 
-	instance.on(sockets.fireEvent, function() {
-		log.debug("Computer under fire");
+	instance.on(sockets.fireEvent, function(data) {
+		log.debug(data);
+		// if (data.player.id === instance.id) {
+		// 	if (data.cellState === "striked") {
+		// 		lastFiredCell = data.cellId;
+		// 	}
+		// }
 	});
 
 	instance.on(sockets.shipDestroyedEvent, function() {
