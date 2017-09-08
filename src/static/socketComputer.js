@@ -18,6 +18,7 @@ socket.emit("joinGame");
 
 socket.on("joined", function(ids) {
 	$("#joined").text("Joined on " + ids.gameId);
+	$("#gameContent").css({"opacity" : "1"});
 	load(ids.playerId);
 });
 
