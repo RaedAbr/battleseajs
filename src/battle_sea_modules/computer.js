@@ -24,61 +24,53 @@ function randomDirection() {
 	return directions[getRandomIntInclusive(0, directions.length - 1)];
 }
 
-function maxFrom(cellId, direction) {
+function maxFrom(cellId, direction, rowsCols) {
 	if (direction === "h") {
-		const line = Math.floor(cellId / model.rowsColumns);
-		return line * model.rowsColumns + model.rowsColumns - 1;
+		const line = Math.floor(cellId / rowsCols);
+		return line * rowsCols + rowsCols - 1;
 	}
 	else {
-		const row = cellId % model.rowsColumns;
-		return model.rowsColumns * model.rowsColumns - model.rowsColumns + row;
+		const row = cellId % rowsCols;
+		return rowsCols * rowsCols - rowsCols + row;
 	}
 }
-
-// console.log(maxFrom(9, "h"));
-// console.log(maxFrom(12, "h"));
-// console.log(maxFrom(20, "h"));
-// console.log(maxFrom(99, "h"));
-// console.log(maxFrom(9, "v"));
-// console.log(maxFrom(12, "v"));
-// console.log(maxFrom(20, "v"));
-// console.log(maxFrom(99, "v"));
 
 function cellsOnWay(cellsTaken, firstCell, shipSize, mult) {
 	let i = firstCell;
 	while (i < firstCell + shipSize * mult) {
-		console.log("\tFor cell " + firstCell);
-		console.log("\tOne cellTaken : " + cellsTaken[i]);
+		// log.debug("\tFor cell " + firstCell);
+		// log.debug("\tOne cellTaken : " + cellsTaken[i]);
 		if (cellsTaken[i] !== undefined) {
-			console.log("\ttrue");
+			// log.debug("\ttrue");
 			return true;
 		}		
 		i += mult;
 	}
-	console.log("\tfalse");
+	// log.debug("\tfalse");
 	return false;
 }
 
-function arrayOfCells() {
+function arrayOfCellsDir(rowsCols) {
 	let cellsTaken = {};
 	let cellsDirShips = [];
+	const maxId = rowsCols * rowsCols - 1;
 	for (let ship of modelShips) {
 		let direction = randomDirection();
-		let firstCell = getRandomIntInclusive(0, model.rowsColumns * model.rowsColumns);
+		let firstCell = getRandomIntInclusive(0, maxId);
 
 		let mult = 1;
 		if (direction === "v") {
-			mult = model.rowsColumns;
+			mult = rowsCols;
 		}
 
-		console.log("\n");
-		console.log(cellsTaken);
-		console.log(ship);
-		console.log(direction);
-		console.log(firstCell);
-		while ((firstCell + mult * (ship.size - 1)) > maxFrom(firstCell, direction) 
+		// log.debug("\n");
+		// log.debug(cellsTaken);
+		// log.debug(ship);
+		// log.debug(direction);
+		// log.debug(firstCell);
+		while ((firstCell + mult * (ship.size - 1)) > maxFrom(firstCell, direction, rowsCols) 
 			|| cellsOnWay(cellsTaken, firstCell, ship.size, mult)) {
-			firstCell = getRandomIntInclusive(0, model.rowsColumns * model.rowsColumns);
+			firstCell = getRandomIntInclusive(0, maxId);
 		}
 
 		let cellsShip = [];
@@ -94,13 +86,20 @@ function arrayOfCells() {
 	return cellsDirShips;
 }
 
-console.log(arrayOfCells());
+for (var i = 0; i < 100; i++) {
+	console.log(arrayOfCellsDir(model.rowsColumns));
+	console.log("\n");
+}
 
-function placeShips(cells) {
+function placeShips() {
 	let ships = [];
-	for (let ship of modelShips) {
-		ships.push(model.Ship(ship.id, ship.name, undefined, undefined));
+	let i = 0;
+	let cellsDir = arrayOfCellsDir(model.rowsColumns);
+	while (i < modelShips.length) {
+		ships.push({id: modelShips[i].id, name: modelShips[i].name, cells: cellsDir[i].cells, dir: cellsDir[i].dir});
+		i++;
 	}
+	log.debug(ships);
 	return ships;
 }
 
@@ -111,7 +110,8 @@ function computer(instance) {
 	
 	instance.on(sockets.joinedEvent, function(ids) {
 		log.debug("Computer joined");
-		instance.emit(sockets.readyEvent, placeShips());
+		instance.emit(sockets.readyEvent, JSON.stringify(placeShips()));
+		log.debug("Computer place ships");
 	});
 
 	instance.on(sockets.playEvent, function() {
