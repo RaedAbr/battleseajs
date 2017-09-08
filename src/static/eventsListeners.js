@@ -15,14 +15,33 @@ function loadListeners() {
 		function cellState() {
 			return event.cellState === "missed" ? "green" : "red";
 		}
+		function cellFired(num) {
+			if (event.cellState === "missed") {
+				d3.select("#g" + num + event.cellId)
+					.attr("fill", "black")
+					.style("opacity", ".3");
+			} else {
+				d3.select("#map" + num).select("svg")
+					.append("image")
+					.attr("xlink:href", "static/img/pr_fire_2.gif")
+					.attr("x", x)
+					.attr("y", y)
+					.attr("width", z)
+					.attr("height", z);
+			}
+		}
+		let x = event.cellId % 10 * z;
+		let y = Math.floor(event.cellId / 10) * z;
 		if (playerId === event.player.id) {
-			d3.select("#g1" + event.cellId)
-				.attr("fill", cellState())
-				.style("opacity", 1);
+			// d3.select("#g1" + event.cellId)
+			// 	.attr("fill", cellState())
+			// 	.style("opacity", 1);
+			cellFired(1);
 		} else {
-			d3.select("#g2" + event.cellId)
-				.attr("fill", cellState())
-				.style("opacity", 1);
+			// d3.select("#g2" + event.cellId)
+			// 	.attr("fill", cellState())
+			// 	.style("opacity", 1);
+			cellFired(2);
 		}
 		var currentdate = new Date();
 		var dateTime = currentdate.getHours() + ":"  
