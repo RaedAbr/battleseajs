@@ -60,7 +60,11 @@ En plus du Javascript "pur" (ES6), nous avons utilisé les technologies suivante
 
 \section{Réalisation de Steven}
 \subsection{Buts}
+Mon but était de mettre en place un serveur avec Node.js pour gérer la communication entre les joueurs et implémenter un mode de jeu "joueur contre ordinateur" (dans un second temps).
+
 \subsection{Travail réalisé}
+J'ai commencé par étudier Node.js. J'avais besoin d'un mécanisme d'échange d'informations sans devoir forcément recharger la page entière. Je pensais aux sockets que j'avais utilisé en C. J'ai également pensé à AJAX. En étudiant son fonctionnement et en lisant plusieurs documentations/tutoriels, j'ai découvert la librairie socket.io qui correspondait exactement à ce dont j'avais besoin. Après quelques essais et test, nous l'avons pleinement adoptée pour communiquer entre le client et le serveur. J'ai posé la structure des entités du jeu (dans model.js) et je l'ai utilisée dans server.js pour les étapes successives du jeu : création/adjonction d'une partie, placement des bateaux sur la grille, échange de tirs, destruction de bateau, fin du jeu.
+
 \subsection{(Questions -) Réponses}
 
 \section{Conclusion}
