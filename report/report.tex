@@ -1,0 +1,83 @@
+\documentclass[a4paper, 11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[scaled]{helvet}
+\renewcommand\familydefault{\sfdefault}
+\usepackage[T1]{fontenc}
+\usepackage[francais]{babel}
+\usepackage[left=2.2cm,top=2.2cm,right=2.2cm,bottom=2.2cm]{geometry}
+\usepackage{graphicx}
+\usepackage{authblk}
+\usepackage{enumitem}
+
+\usepackage{hyperref} 
+\hypersetup{
+	colorlinks,
+	citecolor=black,
+	filecolor=black,
+	linkcolor=black,
+	urlcolor=blue
+}
+
+\begin{document}
+
+\title{Battle Sea JS} 
+\author{Raed Abdennadher et Steven Liatti} 
+\affil{\small Université d'été - Prof Jean-Luc Falcone} 
+\affil{\small Hepia ITI 2\up{ème} année} 
+\maketitle
+
+\section{Introduction}
+\subsection{Description}
+Le but de notre projet est d’implémenter un jeu de bataille navale ("touché-coulé") en Javascript en réseau. Le jeu de bataille navale est un jeu tour par tour ou chaque joueur dispose des bateaux sur une grille. Le but du jeu est de couler tous les bateaux de son adversaire. Le projet est disponible sur \url{https://github.com/steenput/battleseajs}
+
+\subsection{Cahier des charges}
+Nous avons créé le mode de jeu standard, avec une interface graphique (le positionnement des bateaux manuel ou aléatoire, cliquer pour "toucher") côté client. Les bateaux sont représentés par des images. Coté serveur, nous faisons le lien entre les joueurs (transmission des ordres de tir, répercussion sur la grille de l’adversaire, système "d'événements" pour afficher des informations). Un mode joueur contre ordinateur a également été implémenté. L'application est multi instance, plusieurs parties peuvent se jouer en simultané.
+
+\subsection{Répartition du travail}
+Raed s'est occupé de l'interface graphique. Steven s'est occupé du serveur : l'échange des événements et le mode de jeu contre l'ordinateur.
+
+\subsection{Technologies choisies}
+En plus du Javascript "pur" (ES6), nous avons utilisé les technologies suivantes :
+\begin{itemize}
+	\item Côté client :
+	\begin{itemize}
+		\item \href{https://d3js.org/}{Data-Driven Documents} pour la majeur partie de l'interface "cliquable"
+		\item un peu de \href{https://jquery.org/}{jQuery}
+		\item \href{http://getbootstrap.com/}{Bootstrap V4} pour le design en CSS
+	\end{itemize}
+	\item Côté serveur :
+	\begin{itemize}
+		\item \href{https://nodejs.org/en/}{Node.js}, avec
+		\item \href{https://socket.io/}{socket.io} pour l'échange dynamique des informations et
+		\item \href{http://expressjs.com/}{Express} pour gérer les requêtes classiques (peu utilisé)
+	\end{itemize}
+\end{itemize}
+
+\section{Réalisation de Raed}
+\subsection{Buts}
+\subsection{Travail réalisé}
+\subsection{(Questions -) Réponses}
+
+\section{Réalisation de Steven}
+\subsection{Buts}
+\subsection{Travail réalisé}
+\subsection{(Questions -) Réponses}
+
+\section{Conclusion}
+\subsection{État actuel du projet}
+\subsection{Propositions d'améliorations}
+\begin{itemize}
+	\item Côté client :
+	\begin{itemize}
+		\item Enrichir l’interface graphique : effets d’explosion, animations, etc.
+		\item Ajout des effets sonores.
+		\item Modes de jeu alternatifs (que le classique).
+	\end{itemize}
+	\item Côté serveur :
+	\begin{itemize}
+		\item Mode spectateur : identifiant unique par partie qui permet de la visionner.
+		\item Enregistrement en base de données (MongoDB) pour rejouer les parties.
+	\end{itemize}
+\end{itemize}
+
+\end{document}

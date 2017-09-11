@@ -1,7 +1,7 @@
-all: description.pdf mostlyclean
+all: report.pdf mostlyclean
 
-description.pdf: description.tex
-	pdflatex description.tex
+report.pdf: report.tex
+	pdflatex report.tex
 
 mostlyclean:
 	rm -rf *.log *.aux *.out
