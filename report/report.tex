@@ -63,9 +63,17 @@ En plus du Javascript "pur" (ES6), nous avons utilisé les technologies suivante
 Mon but était de mettre en place un serveur avec Node.js pour gérer la communication entre les joueurs et implémenter un mode de jeu "joueur contre ordinateur" (dans un second temps).
 
 \subsection{Travail réalisé}
-J'ai commencé par étudier Node.js. J'avais besoin d'un mécanisme d'échange d'informations sans devoir forcément recharger la page entière. Je pensais aux sockets que j'avais utilisé en C. J'ai également pensé à AJAX. En étudiant son fonctionnement et en lisant plusieurs documentations/tutoriels, j'ai découvert la librairie socket.io qui correspondait exactement à ce dont j'avais besoin. Après quelques essais et test, nous l'avons pleinement adoptée pour communiquer entre le client et le serveur. J'ai posé la structure des entités du jeu (dans model.js) et je l'ai utilisée dans server.js pour les étapes successives du jeu : création/adjonction d'une partie, placement des bateaux sur la grille, échange de tirs, destruction de bateau, fin du jeu.
+J'ai commencé par étudier Node.js. J'avais besoin d'un mécanisme d'échange d'informations sans devoir forcément recharger la page entière. Je pensais aux sockets que j'avais étudié en C en cours de système d'exploitation. J'ai également pensé à AJAX. En étudiant son fonctionnement et en lisant plusieurs documentations/tutoriels, j'ai découvert la librairie socket.io qui correspondait exactement à ce dont j'avais besoin. Après quelques essais et test, nous l'avons pleinement adoptée pour communiquer entre le client et le serveur. J'ai posé la structure des entités du jeu (dans model.js) et je l'ai utilisée dans server.js pour les étapes successives du jeu : création/adjonction d'une partie, placement des bateaux sur la grille, échange de tirs, destruction de bateau, fin du jeu. Une fois que le mode de jeu "joueur contre joueur" était fonctionnel, je me suis attelé au mode "joueur contre ordinateur". J'ai été agréablement surpris par le fait que socket.io fournit également son API côté client, j'ai donc pu réutiliser le format des événements déjà implémentés. Il m'a fallu gérer le positionnement aléatoire des bateaux de l'ordinateur et son style de jeu aléatoire également.
 
 \subsection{(Questions -) Réponses}
+\subparagraph{Qu’est ce qui vous a positivement surpris ?}
+L'efficacité et la simplicité de la librairie socket.io : une fois les bases comprises, l'usage est très facile et chouettes sont les possibilités.
+\subparagraph{Qu’est ce qui vous a pris plus de temps ?}
+La définition du modèle et se mettre d'accord sur le format d'échange de données entre client-serveur.
+\subparagraph{Quel est le pire bug que vous avez eu ?}
+Je n'ai pas personnellement souvenir d'un bug complètement monstrueux. De manière générale, au début du développement, je dirai le langage en lui-même : il n'était pas toujours clair de savoir pourquoi une instruction ne donnait pas le comportement attendu (syntaxe du langage).
+\subparagraph{Au final si vous deviez recommencer que changeriez-vous ?}
+Je prendrai plus de temps pour peaufiner l'API publique et dès le départ fixer son format et ses usages (côté serveur pour ma part).
 
 \section{Conclusion}
 \subsection{État actuel du projet}
