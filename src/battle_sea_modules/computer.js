@@ -94,38 +94,28 @@ function placeShips() {
 	return ships;
 }
 
-function convertCoord(coord, rowsCols) {
-	return coord.row * rowsCols + coord.col;
-}
-
 function neighbourCells(playerId, cellId, rowsCols) {
 	let neighboursCoord = [];
-	let min = 0;
-	let max = rowsCols - 1;
+	const min = 0;
+	const max = rowsCols - 1;
+	const row = Math.floor(cellId / rowsCols);
+	const col = cellId % rowsCols;
 
-	let row = Math.floor(cellId / rowsCols);
-	let col = cellId % rowsCols;
-
-	let i = row - 1;
-	while (i <= row + 1) {
-		let j = col - 1;
-		while (j <= col + 1) {
-			if (i >= min && i <= max && j >= min && j <= max && !(i == row && j == col)) {
-				let coord = {row: i, col: j};
-				let id = convertCoord(coord, rowsCols);
-				if (cellsFired[playerId][id] !== "fired") {
-					neighboursCoord.push(id);
-				}
+	function checkCoord(i, j) {
+		if (i >= min && i <= max && j >= min && j <= max && !(i == row && j == col)) {
+			let id = i * rowsCols + j;
+			if (cellsFired[playerId][id] !== "fired") {
+				neighboursCoord.push(id);
 			}
-			j++;
 		}
-		i++;
 	}
-	return neighboursCoord;
-}
 
-function randomId(cellId, neighbours, rowsCols) {
-	return neighbours[getRandomIntInclusive(0, neighbours.length - 1)];
+	checkCoord(row - 1, col);
+	checkCoord(row + 1, col);
+	checkCoord(row, col - 1);
+	checkCoord(row, col + 1);
+
+	return neighboursCoord;
 }
 
 function randomFire(id, rowsCols) {
@@ -135,7 +125,7 @@ function randomFire(id, rowsCols) {
 		let i = 0;
 		let neighbours = neighbourCells(id, lastStrikedCell[id], rowsCols);
 		do {
-			fireCell = randomId(lastStrikedCell[id], neighbours, rowsCols);
+			fireCell = neighbours[getRandomIntInclusive(0, neighbours.length - 1)];
 			i++;
 			if (i >= neighbours.length) {
 				lastStrikedCell[id] = undefined;
