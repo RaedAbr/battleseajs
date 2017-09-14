@@ -13,6 +13,11 @@ const modelShips = [
 	{id: 4, name: "Battleship", size: 5}
 ];
 
+
+let cellsFired = {};
+let lastStrikedCell = {};
+
+
 function getRandomIntInclusive(min, max) {
 	min = Math.ceil(min);
 	max = Math.floor(max);
@@ -38,15 +43,11 @@ function maxFrom(cellId, direction, rowsCols) {
 function cellsOnWay(cellsTaken, firstCell, shipSize, mult) {
 	let i = firstCell;
 	while (i < firstCell + shipSize * mult) {
-		// log.debug("\tFor cell " + firstCell);
-		// log.debug("\tOne cellTaken : " + cellsTaken[i]);
 		if (cellsTaken[i] !== undefined) {
-			// log.debug("\ttrue");
 			return true;
 		}		
 		i += mult;
 	}
-	// log.debug("\tfalse");
 	return false;
 }
 
@@ -68,12 +69,6 @@ function arrayOfCellsDir(rowsCols) {
 		} while ((firstCell + mult * (ship.size - 1)) > maxFrom(firstCell, direction, rowsCols) 
 			|| cellsOnWay(cellsTaken, firstCell, ship.size, mult));
 
-		// log.debug("\n");
-		// log.debug(cellsTaken);
-		// log.debug(ship);
-		// log.debug(direction);
-		// log.debug(firstCell);
-
 		let cellsShip = [];
 		let i = firstCell;
 		while (i < firstCell + ship.size * mult) {
@@ -87,11 +82,6 @@ function arrayOfCellsDir(rowsCols) {
 	return cellsDirShips;
 }
 
-// for (var i = 0; i < 100; i++) {
-// 	console.log(arrayOfCellsDir(model.rowsColumns));
-// 	console.log("\n");
-// }
-
 function placeShips() {
 	let ships = [];
 	let i = 0;
@@ -104,22 +94,11 @@ function placeShips() {
 	return ships;
 }
 
-let cellsFired = {};
-let lastFiredCell = undefined;
-
 function convertCoord(coord, rowsCols) {
 	return coord.row * rowsCols + coord.col;
 }
 
-// log.debug(convertCoord({row:0, col:0}, model.rowsColumns));
-// log.debug(convertCoord({row:0, col:9}, model.rowsColumns));
-// log.debug(convertCoord({row:1, col:0}, model.rowsColumns));
-// log.debug(convertCoord({row:1, col:9}, model.rowsColumns));
-// log.debug(convertCoord({row:4, col:4}, model.rowsColumns));
-// log.debug(convertCoord({row:9, col:0}, model.rowsColumns));
-// log.debug(convertCoord({row:9, col:9}, model.rowsColumns));
-
-function neighbourCells(cellId, rowsCols) {
+function neighbourCells(playerId, cellId, rowsCols) {
 	let neighboursCoord = [];
 	let min = 0;
 	let max = rowsCols - 1;
@@ -133,36 +112,45 @@ function neighbourCells(cellId, rowsCols) {
 		while (j <= col + 1) {
 			if (i >= min && i <= max && j >= min && j <= max && !(i == row && j == col)) {
 				let coord = {row: i, col: j};
-				// log.debug("\t" + coord.row + ", " + coord.col);
-				neighboursCoord.push(coord);
+				let id = convertCoord(coord, rowsCols);
+				if (cellsFired[playerId][id] !== "fired") {
+					neighboursCoord.push(id);
+				}
 			}
 			j++;
 		}
 		i++;
 	}
-	return neighboursCoord.map(coord => convertCoord(coord, rowsCols));
+	return neighboursCoord;
 }
 
-// log.debug(neighbourCells(0, model.rowsColumns));
-// log.debug(neighbourCells(1, model.rowsColumns));
-// log.debug(neighbourCells(9, model.rowsColumns));
-// log.debug(neighbourCells(20, model.rowsColumns));
-// log.debug(neighbourCells(90, model.rowsColumns));
-// log.debug(neighbourCells(99, model.rowsColumns));
-// log.debug(neighbourCells(95, model.rowsColumns));
-// log.debug(neighbourCells(29, model.rowsColumns));
-// log.debug(neighbourCells(44, model.rowsColumns));
+function randomId(cellId, neighbours, rowsCols) {
+	return neighbours[getRandomIntInclusive(0, neighbours.length - 1)];
+}
 
-function randomFire(rowsCols) {
+function randomFire(id, rowsCols) {
 	const maxId = rowsCols * rowsCols - 1;
 	let fireCell = 0;
-	// if (lastFiredCell !== undefined) {
-		
-	// }
-	do {
-		fireCell = getRandomIntInclusive(0, maxId);
-	} while(cellsFired[fireCell] !== undefined);
-	cellsFired[fireCell] = "fired";
+	if (lastStrikedCell[id] !== undefined) {
+		let i = 0;
+		let neighbours = neighbourCells(id, lastStrikedCell[id], rowsCols);
+		do {
+			fireCell = randomId(lastStrikedCell[id], neighbours, rowsCols);
+			i++;
+			if (i >= neighbours.length) {
+				lastStrikedCell[id] = undefined;
+			}
+			log.debug("first do while");
+		} while(cellsFired[id][fireCell] !== undefined && i < neighbours.length);
+	}
+	else {
+		do {
+			fireCell = getRandomIntInclusive(0, maxId);
+			log.debug("second do while");
+		} while(cellsFired[id][fireCell] !== undefined);
+	}
+	cellsFired[id][fireCell] = "fired";
+	log.debug(cellsFired[id]);
 	return fireCell;
 }
 
@@ -173,30 +161,35 @@ function computer(instance) {
 	
 	instance.on(sockets.joinedEvent, function(ids) {
 		log.debug("Computer joined");
+		cellsFired[ids.playerId] = {};
 		instance.emit(sockets.readyEvent, JSON.stringify(placeShips()));
 		log.debug("Computer place ships");
 	});
 
 	instance.on(sockets.playEvent, function() {
 		log.debug("Computer play");
-		instance.emit(sockets.playEvent, randomFire(model.rowsColumns));
+		instance.emit(sockets.playEvent, randomFire(instance.id, model.rowsColumns));
 	});
 
 	instance.on(sockets.fireEvent, function(data) {
 		log.debug(data);
-		// if (data.player.id === instance.id) {
-		// 	if (data.cellState === "striked") {
-		// 		lastFiredCell = data.cellId;
-		// 	}
-		// }
+		if (data.player.id === instance.id) {
+			if (data.cellState === "striked") {
+				lastStrikedCell[instance.id] = data.cellId;
+			}
+		}
 	});
 
-	instance.on(sockets.shipDestroyedEvent, function() {
-		log.debug("Computer lost a ship");
-	} );
+	instance.on(sockets.shipDestroyedEvent, function(data) {
+		if (data.player.id === instance.id) {
+			lastStrikedCell[instance.id] = undefined;
+			log.debug("player ship destroyed (by computer)");
+		}
+	});
 
 	instance.on(sockets.endGameEvent, function() {
-		log.debug("Computer endGameEvent");
+		log.debug("Computer close");
+		cellsFired[instance.id] = undefined;
 		instance.close();
 	});
 }
