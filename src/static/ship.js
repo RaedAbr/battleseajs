@@ -75,7 +75,6 @@ function drawShips(svg) {
 			let aux = ship.width;
 			ship.width = ship.height;
 			ship.height = aux;
-			// object.attr("width", ship.width).attr("height", ship.height);
 		}
 	};
 
@@ -215,10 +214,6 @@ function drawShips(svg) {
 				.attr("y", ship.y)
 				.attr("width", ship.width)
 				.attr("height", ship.height);
-			// magnet(ship, d3.select("#ship" + ship.id));
-			// defineLimits(ship, d3.select("#ship" + ship.id));
-			// console.log(ship);
-			// updateShipCells(ship, d3.select("#ship" + ship.id));
 		});
 		getReady();
 		console.log(takenCells);

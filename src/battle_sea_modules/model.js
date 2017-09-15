@@ -5,7 +5,6 @@ const rowsColumns = Number(10);
 
 // Represent a cell on the map
 function Cell(id) {
-	// let state = states[0];
 	let c = {
 		id: id,
 		state: states[0],
@@ -52,7 +51,7 @@ function Map(rows, columns) {
 	}
 }
 
-// Represent a player or a viewer
+// Represent a player
 function People(id, name, ships) {
 	return {
 		id: id,
@@ -83,7 +82,6 @@ function Game(id, iDplayerOne, free) {
 		iDplayerTwo: undefined,
 		status: "wait",
 		free: free,
-		viewers: [],
 		toString: function() {
 			return "(Game : {id: " + this.id + ", iDplayerOne: " + this.iDplayerOne 
 				+ ", iDplayerTwo: " + this.iDplayerTwo + ", status: " + this.status 

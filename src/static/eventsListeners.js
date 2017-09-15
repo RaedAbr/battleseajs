@@ -33,14 +33,8 @@ function loadListeners() {
 		let x = event.cellId % 10 * z;
 		let y = Math.floor(event.cellId / 10) * z;
 		if (playerId === event.player.id) {
-			// d3.select("#g1" + event.cellId)
-			// 	.attr("fill", cellState())
-			// 	.style("opacity", 1);
 			cellFired(1);
 		} else {
-			// d3.select("#g2" + event.cellId)
-			// 	.attr("fill", cellState())
-			// 	.style("opacity", 1);
 			cellFired(2);
 		}
 		var currentdate = new Date();

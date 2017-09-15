@@ -58,11 +58,6 @@ io.on("connection", function(socket) {
 		sockets.createGame(io, socket, people, games, false);
 	});
 
-	// socket.on(sockets.createGameComputerEvent, function() {
-	// 	log.debug("in createGameComputer");
-	// 	gameIdComputer = sockets.createGame(io, socket, people, games, true);
-	// });
-
 	socket.on(sockets.joinGameEvent, function() {
 		if (gameIdOnHold === undefined) {
 			log.debug("in if joinGame");
@@ -79,11 +74,6 @@ io.on("connection", function(socket) {
 		log.debug("in " + sockets.joinGameIdEvent);
 		sockets.joinGame(io, socket, id, people, games);
 	});
-
-	// socket.on(sockets.joinGameComputerEvent, function() {
-	// 	log.debug("in " + sockets.joinGameComputerEvent);
-	// 	gameIdComputer = sockets.joinGame(io, socket, gameIdComputer, people, games);
-	// });
 
 	socket.on(sockets.readyEvent, function(dataShips) {
 		let player = people[socket.id];
@@ -154,15 +144,5 @@ io.on("connection", function(socket) {
 		if (continuousGame) {
 			io.to(opponent.id).emit(sockets.playEvent, opponent.id);
 		}
-	});
-
-	socket.on(sockets.viewGameEvent, function(id) {
-		games[id].viewers.push(id);
-		socket.join(id);
-	});
-
-	socket.on(sockets.listViewersInRoomEvent, function(id) {
-		// let names = 
-		// socket.emit(JSON.stringify(people));
 	});
 });

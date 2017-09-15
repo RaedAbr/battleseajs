@@ -20,8 +20,6 @@ const endGameEvent = "endGame";
 
 const peopleListEvent = "people";
 const listGamesEvent = "games";
-const viewGameEvent = "viewGame";
-const listViewersInRoomEvent = "listViewersInRoom";
 
 function peopleList(io, people) {
 	io.emit(peopleListEvent, Object.keys(people).map(key => people[key].name)); // emit to all socket in all rooms
@@ -44,7 +42,6 @@ function createGame(io, socket, people, games, free) {
 	else {
 		socket.emit(createGameEvent, gameId);
 	}
-	// io.emit("games", names);
 	listGames(io, people, games);
 	log.debug("A new game is created : ");
 	log.debug(games[gameId]);
@@ -93,8 +90,6 @@ exports.shipDestroyedEvent = shipDestroyedEvent;
 exports.endGameEvent = endGameEvent;
 exports.peopleListEvent = peopleListEvent;
 exports.listGamesEvent = listGamesEvent;
-exports.viewGameEvent = viewGameEvent;
-exports.listViewersInRoomEvent = listViewersInRoomEvent;
 
 exports.peopleList = peopleList;
 exports.listGames = listGames;

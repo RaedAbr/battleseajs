@@ -28,16 +28,16 @@
 
 \section{Introduction}
 \subsection{Description}
-Le but de notre projet est d’implémenter un jeu de bataille navale ("touché-coulé") en Javascript en réseau. Le jeu de bataille navale est un jeu tour par tour ou chaque joueur dispose des bateaux sur une grille. Le but du jeu est de couler tous les bateaux de son adversaire. Le projet est disponible sur \url{https://github.com/steenput/battleseajs}
+Le but de notre projet est d’implémenter un jeu de bataille navale ("touché-coulé") en JavaScript en réseau. Le jeu de bataille navale est un jeu 2 joueurs, tour par tour, ou chaque joueur dispose des bateaux sur une grille. Le but du jeu est de couler tous les bateaux de son adversaire. Le projet est disponible sur \url{https://github.com/steenput/battleseajs}
 
 \subsection{Cahier des charges}
-Nous avons créé le mode de jeu standard, avec une interface graphique (le positionnement des bateaux manuel ou aléatoire, cliquer pour "toucher") côté client. Les bateaux sont représentés par des images. Coté serveur, nous faisons le lien entre les joueurs (transmission des ordres de tir, répercussion sur la grille de l’adversaire, système "d'événements" pour afficher des informations). Un mode joueur contre ordinateur a également été implémenté. L'application est multi instance, plusieurs parties peuvent se jouer en simultané.
+Nous avons créé le mode de jeu standard, avec une interface graphique (le positionnement des bateaux manuel ou aléatoire, cliquer pour "tirer") côté client. Les bateaux sont représentés par des images. Coté serveur, nous faisons le lien entre les joueurs (transmission des ordres de tir, répercussion sur la grille de l’adversaire, système "d'événements" pour afficher des informations). Un mode joueur contre ordinateur a également été implémenté. L'application est multi instance, plusieurs parties peuvent se jouer en simultané.
 
 \subsection{Répartition du travail}
 Raed s'est occupé de l'interface graphique. Steven s'est occupé du serveur : l'échange des événements et le mode de jeu contre l'ordinateur.
 
 \subsection{Technologies choisies}
-En plus du Javascript "pur" (ES6), nous avons utilisé les technologies suivantes :
+En plus du JavaScript "pur" (ES6), nous avons utilisé les technologies suivantes :
 \begin{itemize}
 	\item Côté client :
 	\begin{itemize}
@@ -59,34 +59,34 @@ Le but de mon travail était de mettre en place le graphique du jeu, autrement d
 soit pour lancer une nouvelle partie du jeu, soit pour rejoindre une, créée par un autre joueur.
 
 \subsection{Travail réalisé}
-\paragraph{} Pour commencer, j'ai fait quelques recherches sur les frameworks JavaScript qui existent, et que je peux utiliser pour tout ce qui est dessin et manipulation d'objets dans une page web. Finalement, j'ai choisi de travailler avec D3 (Data-Driven Documents v4). D3 c'est 
+\paragraph{} Pour commencer, j'ai fait quelques recherches sur les frameworks JavaScript qui existent, et que je peux utiliser pour tout ce qui est dessin et manipulation d'objets dans une page web. Finalement, j'ai choisi de travailler avec D3 (Data-Driven Documents v4). D3 est 
 une librairie JavaScript pour manipuler les données et les visualiser utilisant HTML, SVG et CSS.
 \paragraph{} Dans un premier temps, j'ai commencer par construire deux grilles de jeu qui représentent les cartes de chaque joueur : à
 gauche, la carte de l'adversaire, et à droite, sa propre carte. Une carte est constituée de 10x10 cellules, donc 100 entiers stockés dans
 un tableau. Chaque entier représente un identifiant d'une cellule. Ce tableau est passé à une fonction dans D3 pour représenter ses 
-éléments dans une balise SVG de HTML. Après, j'ai construit les bateaux. Ils sont représentés par un tableau d'objet, et paraiment 
-passé à D3 pour la représentation graphique.
-\paragraph{} Dans un deuxième temps, je me suis interessé à gérer les évennements d'intercation entre interface et utilisateur (déplacement
-des bateaux, les cliques sur les cases pour tirer, gestion de collision...). Et finalement, j'ai créé une fonction qui permet de placer les
+éléments dans une balise SVG de HTML. Après, j'ai construit les bateaux. Ils sont représentés par un tableau d'objets, et aussi 
+passés à D3 pour la représentation graphique.
+\paragraph{} Dans un deuxième temps, je me suis intéressé à gérer les évenements d'intéraction entre interface et utilisateur (déplacement
+des bateaux, les clics sur les cases pour tirer, gestion de collision...). Et finalement, j'ai créé une fonction qui permet de placer les
 bateaux dans la carte d'une façon aléatoire.
-\paragraph{} Durant une partie, le client communique avec le serveur via différents évènements (expliqué plus en détail dans la section de mon colègue). Par exemple,
+\paragraph{} Durant une partie, le client communique avec le serveur via différents évènements (expliqué plus en détail dans la section de mon collègue). Par exemple,
 au moment où le client clique sur "join" pour rejoindre une partie, un évènement spécifique est lancé et envoyé au serveur qui écoute sur celui-là, exécute
-les traitemets nécessaires et renvyer la réponse au client (changement du contenue de la page HTML).
+les traitemets nécessaires et renvoie la réponse au client (changement du contenu de la page HTML).
 
 \subsection{(Questions -) Réponses}
 \subparagraph{Qu’est ce qui vous a positivement surpris ?}
 \begin{itemize}
-\item L'efficacité de la librairie D3 : après avoir su la syntaxe, la manipulation des objets (insersion, animation, rotation...) devient très facile à coder.
+\item L'efficacité de la librairie D3 : après avoir su la syntaxe, la manipulation des objets (insertion, animation, rotation...) devient très facile à coder.
 \item La facilité de l'échange de données entre le client et le serveur via la librairie socket.io.
 \end{itemize}
 \subparagraph{Qu’est ce qui vous a pris plus de temps ?}
 La fonction pour placer les bateaux sur la carte d'une façon aléatoire et la gestion de collision entre les bateaux.
 \subparagraph{Quel est le pire bug que vous avez eu ?}
-Au moment où l'utilisateur click-droite avec la sourie sur un bateau, ce dernier est censé effectuer une rotation de 90 degrés. Par contre, ce qui s'est passé c'est que
+Au moment où l'utilisateur clic-droit avec la souris sur un bateau, ce dernier est censé effectuer une rotation de 90 degrés. Par contre, ce qui s'est passé c'est que
 le rectangle du bateau effectue la rotation, alors que l'image reste dans son état initial. Pour résoudre ce bug, j'ai mis deux images pour chaque bateau : 
-une de direction vertical, et l'autre horisontal. Au moment du click, je charge l'image entière qui correspond à la nouvelle direction à nouveau.
+une de direction verticale, et l'autre horizontale. Au moment du clic, je charge l'image entière qui correspond à la nouvelle direction à nouveau.
 \subparagraph{Au final si vous deviez recommencer que changeriez-vous ?}
-J'implémenterai un moteur graphique pour le jeu, au lieu de travailler avec D3 nativement.
+J'implémenterai un moteur graphique pour le jeu, au lieu de travailler avec D3 nativement, pour apprendre de nouvelles techniques.
 
 \section{Réalisation de Steven}
 \subsection{Buts}
@@ -101,19 +101,19 @@ L'efficacité et la simplicité de la librairie socket.io : une fois les bases c
 \subparagraph{Qu’est ce qui vous a pris plus de temps ?}
 La définition du modèle et se mettre d'accord sur le format d'échange de données entre client-serveur.
 \subparagraph{Quel est le pire bug que vous avez eu ?}
-Je n'ai pas personnellement souvenir d'un bug complètement monstrueux. De manière générale, au début du développement, je dirai le langage en lui-même : il n'était pas toujours clair de savoir pourquoi une instruction ne donnait pas le comportement attendu (syntaxe du langage).
+Je n'ai pas personnellement souvenir d'un bug complètement monstrueux. De manière générale, au début du développement, je dirai le langage en lui-même : il n'était pas toujours clair de savoir pourquoi une instruction ne donnait pas le comportement attendu (syntaxe du langage + typage dynamique).
 \subparagraph{Au final si vous deviez recommencer que changeriez-vous ?}
 Je prendrai plus de temps pour peaufiner l'API publique et dès le départ fixer son format et ses usages (côté serveur pour ma part).
 
 \section{Conclusion}
 \subsection{État actuel du projet}
+Le serveur multi-instance est fonctionnel, le mode joueur contre joueur et joueur contre ordinateur fonctionne, l'interface graphique est propre et fonctionnelle. Il reste un problème qui ne doit pas être très difficile à résoudre : si un joueur (joueur A) en mode joueur contre joueur "join" une partie et attend un autre joueur et qu'un autre joueur (joueur B) rejoint une partie contre l'ordinateur, le joueur A se retrouve à joueur contre l'ordinateur et le joueur B en attente. Pour résoudre cela, il suffirait de changer le mécanisme de "join game", en dédier un unique à l'ordinateur par exemple.
 \subsection{Propositions d'améliorations}
 \begin{itemize}
 	\item Côté client :
 	\begin{itemize}
 		\item Enrichir l’interface graphique : effets d’explosion, animations, etc.
 		\item Ajout des effets sonores.
-		\item Modes de jeu alternatifs (que le classique).
 	\end{itemize}
 	\item Côté serveur :
 	\begin{itemize}

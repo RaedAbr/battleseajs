@@ -39,11 +39,6 @@ socket.on("joined", function(ids) {
 	load(ids.playerId);
 });
 
-// socket.on("play", function(id) {
-// 	let st = playerId === id ? "Play! Your turn..." : "Wait ! Adversary's turn...";
-// 	$("#play").text(st);
-// });
-
 socket.on("endGame", function() {
 	socket.close();
 });
